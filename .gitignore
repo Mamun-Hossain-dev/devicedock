@@ -1,2 +1,4 @@
 # Environment
-
+.env.*.local
+config.bat
+node_modules
