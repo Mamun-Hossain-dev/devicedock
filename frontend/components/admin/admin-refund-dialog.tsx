@@ -85,8 +85,8 @@ export function AdminRefundDialog({
             Request a refund
           </Dialog.Title>
           <Dialog.Description className="mt-3 text-sm leading-6 text-black/55">
-            Refund a captured payment back to the customer. Submitting is
-            idempotent, so double-clicks will not create duplicates.
+            Return a payment to your customer. You can refund the full amount
+            or a partial amount.
           </Dialog.Description>
 
           <form
