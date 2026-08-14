@@ -2,12 +2,12 @@ export type Category =
   "MOBILE" | "LAPTOP" | "TABLET" | "AUDIO" | "WATCH" | "ACCESSORY";
 
 export interface ProductImage {
-  id: number;
+  id: string;
   url: string;
 }
 
 export interface Product {
-  id: number;
+  id: string;
   slug: string;
   sku: string;
   title: string;
@@ -31,7 +31,7 @@ export interface Product {
 }
 
 export interface StockMovement {
-  id: number;
+  id: string;
   previousStock: number;
   newStock: number;
   change: number;
@@ -87,7 +87,7 @@ export interface AnalyticsOverview {
     orders: number;
   }>;
   topProducts: Array<{
-    productId: number | null;
+    productId: string | null;
     title: string;
     sku: string;
     unitsSold: number;
@@ -101,7 +101,7 @@ export interface AnalyticsOverview {
 
 export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 export interface Review {
-  id: number;
+  id: string;
   rating: number;
   title: string;
   comment: string;
@@ -109,7 +109,7 @@ export interface Review {
   isVerified: boolean;
   createdAt: string;
   user: { name: string; email?: string };
-  product: { id: number; title: string; sku: string };
+  product: { id: string; title: string; sku: string };
 }
 export interface PaginatedReviews {
   data: Review[];
@@ -117,7 +117,7 @@ export interface PaginatedReviews {
 }
 
 export interface Coupon {
-  id: number;
+  id: string;
   code: string;
   description: string | null;
   type: "PERCENTAGE" | "FIXED";
@@ -165,7 +165,7 @@ export interface PaginatedProducts {
 export type Role = "USER" | "SELLER" | "ADMIN";
 
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone: string | null;
@@ -188,13 +188,13 @@ export interface AuthResult {
 }
 
 export interface CartItem {
-  productId: number;
+  productId: string;
   quantity: number;
   product: Product;
 }
 
 export interface Address {
-  id: number;
+  id: string;
   label: string;
   recipientName: string;
   phone: string;
@@ -207,8 +207,8 @@ export interface Address {
 }
 
 export interface WishlistItem {
-  id: number;
-  productId: number;
+  id: string;
+  productId: string;
   createdAt: string;
   product: Product;
 }
@@ -220,7 +220,7 @@ export interface NotificationPreference {
 }
 
 export interface AccountNotification {
-  id: number;
+  id: string;
   type: string;
   title: string;
   message: string;
@@ -246,7 +246,7 @@ export interface ApiEnvelope<T> {
 export type ContactStatus = "NEW" | "IN_PROGRESS" | "RESOLVED";
 
 export interface ContactMessage {
-  id: number;
+  id: string;
   name: string;
   email: string;
   subject: string;
@@ -257,7 +257,7 @@ export interface ContactMessage {
 }
 
 export interface NewsletterSubscriber {
-  id: number;
+  id: string;
   email: string;
   name: string | null;
   status: "ACTIVE" | "UNSUBSCRIBED";
@@ -265,7 +265,7 @@ export interface NewsletterSubscriber {
 }
 
 export interface NewsletterBroadcast {
-  id: number;
+  id: string;
   subject: string;
   previewText: string | null;
   content: string;
@@ -307,8 +307,8 @@ export type OrderStatus =
   | "CANCELLED";
 
 export interface OrderItem {
-  id: number;
-  productId: number | null;
+  id: string;
+  productId: string | null;
   productTitle: string;
   productSku: string;
   unitAmount: number;
@@ -317,9 +317,9 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: number;
+  id: string;
   orderNumber: string;
-  userId: number;
+  userId: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -340,16 +340,16 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
-  payments?: Array<{ id: number; amount: number; status: PaymentStatus }>;
+  payments?: Array<{ id: string; amount: number; status: PaymentStatus }>;
   refundRequests?: Array<{
-    id: number;
+    id: string;
     reason: string;
     status: RefundRequestStatus;
     decisionNote: string | null;
     reviewedAt: string | null;
     createdAt: string;
     refund: {
-      id: number;
+      id: string;
       amount: number;
       status: RefundStatus;
     } | null;
@@ -357,8 +357,8 @@ export interface Order {
 }
 
 export interface Payment {
-  id: number;
-  orderId: number;
+  id: string;
+  orderId: string;
   status: PaymentStatus;
   amount: number;
   currency: string;
@@ -371,9 +371,9 @@ export interface Payment {
 }
 
 export interface CheckoutSession {
-  paymentId: number;
+  paymentId: string;
   paymentIntentId: string;
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   clientSecret: string;
   amount: number;
@@ -397,8 +397,8 @@ export interface PaginatedOrders {
 export type RefundStatus = "PENDING" | "SUCCEEDED" | "FAILED";
 
 export interface Refund {
-  id: number;
-  paymentId: number;
+  id: string;
+  paymentId: string;
   providerRefundId: string | null;
   amount: number;
   currency: string;
@@ -406,22 +406,22 @@ export interface Refund {
   status: RefundStatus;
   failureCode: string | null;
   failureMessage: string | null;
-  requestedById: number | null;
+  requestedById: string | null;
   idempotencyKey: string;
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
   payment: {
-    id: number;
-    orderId: number;
+    id: string;
+    orderId: string;
     providerIntentId: string | null;
     status: PaymentStatus;
     amount: number;
     currency: string;
     order: {
-      id: number;
+      id: string;
       orderNumber: string;
-      userId: number;
+      userId: string;
       customerName: string;
       customerEmail: string;
       paymentMethod: "CARD" | "CASH_ON_DELIVERY";
@@ -439,19 +439,19 @@ export interface PaginatedRefunds {
 export type RefundRequestStatus = "PENDING" | "APPROVED" | "DENIED";
 
 export interface RefundRequest {
-  id: number;
-  orderId: number;
-  userId: number;
+  id: string;
+  orderId: string;
+  userId: string;
   reason: string;
   status: RefundRequestStatus;
-  refundId: number | null;
-  adminId: number | null;
+  refundId: string | null;
+  adminId: string | null;
   decisionNote: string | null;
   reviewedAt: string | null;
   createdAt: string;
   updatedAt: string;
   order: {
-    id: number;
+    id: string;
     orderNumber: string;
     status: OrderStatus;
     totalAmount: number;
@@ -461,7 +461,7 @@ export interface RefundRequest {
     paymentMethod: "CARD" | "CASH_ON_DELIVERY";
   };
   refund: {
-    id: number;
+    id: string;
     amount: number;
     currency: string;
     status: RefundStatus;

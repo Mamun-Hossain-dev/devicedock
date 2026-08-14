@@ -111,7 +111,7 @@ export class PrismaProductRepository implements ProductRepository {
         take: options.take,
         where,
         orderBy,
-        include: { images: { orderBy: { id: 'asc' } } },
+        include: { images: { orderBy: { createdAt: 'asc' } } },
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -119,16 +119,16 @@ export class PrismaProductRepository implements ProductRepository {
     return { data, totalItems };
   }
 
-  async findById(id: number): Promise<Product | null> {
+  async findById(id: string): Promise<Product | null> {
     return await this.prisma.product.findUnique({
       where: { id },
-      include: { images: { orderBy: { id: 'asc' } } },
+      include: { images: { orderBy: { createdAt: 'asc' } } },
     });
   }
 
   async findCollections(limit: number): Promise<ProductCollections> {
     const now = new Date();
-    const include = { images: { orderBy: { id: 'asc' as const } } };
+    const include = { images: { orderBy: { createdAt: 'asc' as const } } };
     const active = {
       status: 'ACTIVE' as const,
       publishedAt: { lte: now },
@@ -243,9 +243,9 @@ export class PrismaProductRepository implements ProductRepository {
   }
 
   async adjustStock(
-    id: number,
+    id: string,
     quantity: number,
-    adjustedById: number,
+    adjustedById: string,
     reason: string,
   ): Promise<StockAdjustment | null> {
     return this.prisma.$transaction(async (prisma) => {
@@ -254,7 +254,7 @@ export class PrismaProductRepository implements ProductRepository {
       const product = await prisma.product.update({
         where: { id },
         data: { quantity },
-        include: { images: { orderBy: { id: 'asc' } } },
+        include: { images: { orderBy: { createdAt: 'asc' } } },
       });
       const movement = await prisma.stockMovement.create({
         data: {
@@ -284,7 +284,7 @@ export class PrismaProductRepository implements ProductRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     input: UpdateProductInput,
     images: NewProductImage[] = [],
   ): Promise<Product | null> {
@@ -302,12 +302,12 @@ export class PrismaProductRepository implements ProductRepository {
         ...input,
         images: images.length ? { create: images } : undefined,
       },
-      include: { images: { orderBy: { id: 'asc' } } },
+      include: { images: { orderBy: { createdAt: 'asc' } } },
     });
   }
 
   async addImages(
-    id: number,
+    id: string,
     images: NewProductImage[],
   ): Promise<Product | null> {
     const existingProduct = await this.prisma.product.findUnique({
@@ -324,21 +324,21 @@ export class PrismaProductRepository implements ProductRepository {
   }
 
   async findImage(
-    productId: number,
-    imageId: number,
+    productId: string,
+    imageId: string,
   ): Promise<ProductImage | null> {
     return this.prisma.productImage.findFirst({
       where: { id: imageId, productId },
     });
   }
 
-  async deleteImage(productId: number, imageId: number): Promise<void> {
+  async deleteImage(productId: string, imageId: string): Promise<void> {
     await this.prisma.productImage.deleteMany({
       where: { id: imageId, productId },
     });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.prisma.product.delete({
       where: { id },
     });

@@ -38,8 +38,8 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   create(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
     reason: string,
   ): Promise<RefundRequestView> {
     return this.prisma.refundRequest.create({
@@ -48,7 +48,7 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
     });
   }
 
-  findById(requestId: number): Promise<RefundRequestView | null> {
+  findById(requestId: string): Promise<RefundRequestView | null> {
     return this.prisma.refundRequest.findUnique({
       where: { id: requestId },
       include: refundRequestInclude,
@@ -56,8 +56,8 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   }
 
   findOwnedById(
-    userId: number,
-    requestId: number,
+    userId: string,
+    requestId: string,
   ): Promise<RefundRequestView | null> {
     return this.prisma.refundRequest.findFirst({
       where: { id: requestId, userId },
@@ -65,7 +65,7 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
     });
   }
 
-  findActiveForOrder(orderId: number): Promise<RefundRequestView | null> {
+  findActiveForOrder(orderId: string): Promise<RefundRequestView | null> {
     return this.prisma.refundRequest.findFirst({
       where: { orderId, status: { in: ['PENDING', 'APPROVED'] } },
       orderBy: { createdAt: 'desc' },
@@ -74,8 +74,8 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   }
 
   async findRefundableOrder(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
   ): Promise<RefundableOrder | null> {
     const order = await this.prisma.order.findFirst({
       where: { id: orderId, userId },
@@ -104,7 +104,7 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   }
 
   async findAllForUser(
-    userId: number,
+    userId: string,
     query: RefundRequestListQuery,
   ): Promise<PaginatedResult<RefundRequestView>> {
     return this.findMany({
@@ -130,9 +130,9 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   }
 
   async approve(
-    requestId: number,
-    adminId: number,
-    refundId: number,
+    requestId: string,
+    adminId: string,
+    refundId: string,
     note: string | null,
   ): Promise<RefundRequestView | null> {
     return this.decide(requestId, {
@@ -145,8 +145,8 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   }
 
   async deny(
-    requestId: number,
-    adminId: number,
+    requestId: string,
+    adminId: string,
     note: string | null,
   ): Promise<RefundRequestView | null> {
     return this.decide(requestId, {
@@ -194,11 +194,11 @@ export class PrismaRefundRequestRepository implements RefundRequestRepository {
   }
 
   private async decide(
-    requestId: number,
+    requestId: string,
     data: {
       status: 'APPROVED' | 'DENIED';
-      adminId: number;
-      refundId?: number;
+      adminId: string;
+      refundId?: string;
       decisionNote: string | null;
       reviewedAt: Date;
     },

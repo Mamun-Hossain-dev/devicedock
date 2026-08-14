@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -35,7 +35,7 @@ export class CartController {
   @ResponseMessage('Cart item updated')
   updateItem(
     @CurrentUser() user: PublicUser,
-    @Param('productId', ParseIntPipe) productId: number,
+    @Param('productId', ParseUUIDPipe) productId: string,
     @Body() dto: UpdateCartItemDto,
   ) {
     return this.cartService.updateItem(user.id, productId, dto.quantity);
@@ -45,7 +45,7 @@ export class CartController {
   @ResponseMessage('Product removed from cart')
   removeItem(
     @CurrentUser() user: PublicUser,
-    @Param('productId', ParseIntPipe) productId: number,
+    @Param('productId', ParseUUIDPipe) productId: string,
   ) {
     return this.cartService.removeItem(user.id, productId);
   }

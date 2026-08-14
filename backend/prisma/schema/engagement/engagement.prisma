@@ -23,7 +23,7 @@ enum NewsletterDeliveryStatus {
 }
 
 model ContactMessage {
-  id        Int                  @id @default(autoincrement())
+  id        String               @id @default(uuid(7)) @db.Uuid
   name      String
   email     String
   subject   String
@@ -38,11 +38,11 @@ model ContactMessage {
 }
 
 model NewsletterSubscriber {
-  id             Int                        @id @default(autoincrement())
+  id             String                     @id @default(uuid(7)) @db.Uuid
   email          String                     @unique
   name           String?
   status         NewsletterSubscriberStatus @default(ACTIVE)
-  userId         Int?                       @unique
+  userId         String?                    @unique @db.Uuid
   user           User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
   subscribedAt   DateTime                   @default(now())
   unsubscribedAt DateTime?
@@ -54,7 +54,7 @@ model NewsletterSubscriber {
 }
 
 model NewsletterBroadcast {
-  id             Int                       @id @default(autoincrement())
+  id             String                    @id @default(uuid(7)) @db.Uuid
   subject        String
   previewText    String?
   content        String
@@ -72,8 +72,8 @@ model NewsletterBroadcast {
 }
 
 model NewsletterDelivery {
-  id          Int                      @id @default(autoincrement())
-  broadcastId Int
+  id          String                   @id @default(uuid(7)) @db.Uuid
+  broadcastId String                   @db.Uuid
   email       String
   status      NewsletterDeliveryStatus @default(PENDING)
   error       String?
@@ -94,10 +94,10 @@ enum ReviewStatus {
 }
 
 model Review {
-  id         Int          @id @default(autoincrement())
-  productId  Int
+  id         String       @id @default(uuid(7)) @db.Uuid
+  productId  String       @db.Uuid
   product    Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
-  userId     Int
+  userId     String       @db.Uuid
   user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   rating     Int
   title      String

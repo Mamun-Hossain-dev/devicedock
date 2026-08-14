@@ -28,7 +28,7 @@ export class OperationsService {
     return this.repository.getInventory(query);
   }
 
-  getProductMovements(productId: number, query: PaginationQueryDto) {
+  getProductMovements(productId: string, query: PaginationQueryDto) {
     return this.repository.getProductMovements(productId, query);
   }
 
@@ -37,9 +37,9 @@ export class OperationsService {
   }
 
   adjustStock(
-    productId: number,
+    productId: string,
     quantity: number,
-    adjustedById: number,
+    adjustedById: string,
     reason: string,
   ) {
     return this.productsService.adjustStock(
@@ -50,11 +50,11 @@ export class OperationsService {
     );
   }
 
-  createReview(userId: number, productId: number, input: CreateReviewDto) {
+  createReview(userId: string, productId: string, input: CreateReviewDto) {
     return this.repository.createReview(userId, productId, input);
   }
 
-  getProductReviews(productId: number) {
+  getProductReviews(productId: string) {
     return this.repository.getProductReviews(productId);
   }
 
@@ -62,7 +62,7 @@ export class OperationsService {
     return this.repository.getReviews(query);
   }
 
-  moderateReview(id: number, status: 'APPROVED' | 'REJECTED') {
+  moderateReview(id: string, status: 'APPROVED' | 'REJECTED') {
     return this.repository.moderateReview(id, status);
   }
 
@@ -79,12 +79,12 @@ export class OperationsService {
     return this.repository.createCoupon(input);
   }
 
-  updateCoupon(id: number, input: UpdateCouponDto) {
+  updateCoupon(id: string, input: UpdateCouponDto) {
     this.validateCoupon(input);
     return this.repository.updateCoupon(id, input);
   }
 
-  deleteCoupon(id: number) {
+  deleteCoupon(id: string) {
     return this.repository.deleteCoupon(id);
   }
 

@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomUUID } from 'node:crypto';
+import { isUUID } from 'class-validator';
 import { RedisService } from '../../infrastructure/redis/redis.service';
 import { AppException } from '../../common/exceptions/app.exception';
 import type { SessionMetadata } from './interfaces/auth.interface';
 
 interface StoredSession {
-  userId: number;
+  userId: string;
   hashedRefreshToken: string;
   device: string;
   ip: string;
@@ -15,7 +16,7 @@ interface StoredSession {
 }
 
 export interface RefreshSessionResult {
-  userId: number;
+  userId: string;
   refreshToken: string;
   expiresAt: Date;
 }
@@ -43,7 +44,7 @@ export class AuthSessionService {
   }
 
   async create(
-    userId: number,
+    userId: string,
     metadata: SessionMetadata,
   ): Promise<RefreshSessionResult> {
     this.assertRedisReady();
@@ -147,7 +148,7 @@ export class AuthSessionService {
   }
 
   async list(
-    userId: number,
+    userId: string,
     currentRefreshToken?: string,
   ): Promise<PublicAuthSession[]> {
     this.assertRedisReady();
@@ -180,7 +181,7 @@ export class AuthSessionService {
     );
   }
 
-  async revokeSession(userId: number, sessionId: string): Promise<void> {
+  async revokeSession(userId: string, sessionId: string): Promise<void> {
     this.assertRedisReady();
     const raw = await this.redis.get(this.sessionKey(sessionId));
     if (!raw) return;
@@ -200,7 +201,7 @@ export class AuthSessionService {
       : undefined;
   }
 
-  private async revokeBySessionId(sessionId: string, userId: number) {
+  private async revokeBySessionId(sessionId: string, userId: string) {
     await this.redis
       .getClient()
       .multi()
@@ -227,7 +228,11 @@ export class AuthSessionService {
 
   private parseSession(rawSession: string): StoredSession {
     try {
-      return JSON.parse(rawSession) as StoredSession;
+      const session = JSON.parse(rawSession) as StoredSession;
+      if (!session || !isUUID(session.userId)) {
+        throw this.invalidRefreshToken();
+      }
+      return session;
     } catch {
       throw this.invalidRefreshToken();
     }
@@ -245,7 +250,7 @@ export class AuthSessionService {
     return `session:${sessionId}`;
   }
 
-  private userSessionsKey(userId: number) {
+  private userSessionsKey(userId: string) {
     return `user:${userId}:sessions`;
   }
 

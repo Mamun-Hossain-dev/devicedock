@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Put,
@@ -39,7 +39,7 @@ export class AccountController {
   @ResponseMessage('Address updated successfully')
   updateAddress(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: SaveAddressDto,
   ) {
     return this.service.updateAddress(user.id, id, dto);
@@ -49,7 +49,7 @@ export class AccountController {
   @ResponseMessage('Address deleted successfully')
   async deleteAddress(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     await this.service.deleteAddress(user.id, id);
     return null;
@@ -71,7 +71,7 @@ export class AccountController {
   @ResponseMessage('Product removed from wishlist')
   async removeWishlist(
     @CurrentUser() user: PublicUser,
-    @Param('productId', ParseIntPipe) productId: number,
+    @Param('productId', ParseUUIDPipe) productId: string,
   ) {
     await this.service.removeWishlist(user.id, productId);
     return null;
@@ -87,7 +87,7 @@ export class AccountController {
   @ResponseMessage('Notification marked as read')
   async markRead(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     await this.service.markNotificationRead(user.id, id);
     return null;

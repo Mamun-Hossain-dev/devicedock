@@ -8,8 +8,8 @@ import type {
 export type RefundStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED';
 
 export interface RefundView {
-  id: number;
-  paymentId: number;
+  id: string;
+  paymentId: string;
   providerRefundId: string | null;
   amount: number;
   currency: string;
@@ -17,22 +17,22 @@ export interface RefundView {
   status: RefundStatus;
   failureCode: string | null;
   failureMessage: string | null;
-  requestedById: number | null;
+  requestedById: string | null;
   idempotencyKey: string;
   completedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
   payment: {
-    id: number;
-    orderId: number;
+    id: string;
+    orderId: string;
     providerIntentId: string | null;
     status: PaymentStatus;
     amount: number;
     currency: string;
     order: {
-      id: number;
+      id: string;
       orderNumber: string;
-      userId: number;
+      userId: string;
       customerName: string;
       customerEmail: string;
       paymentMethod: CheckoutPaymentMethod;
@@ -46,7 +46,7 @@ export interface CreateRefundInput {
   providerRefundId: string;
   amount: number;
   reason: string | null;
-  requestedById: number;
+  requestedById: string;
   idempotencyKey: string;
 }
 
@@ -54,7 +54,7 @@ export interface RefundListQuery {
   page: number;
   limit: number;
   status?: RefundStatus;
-  paymentId?: number;
+  paymentId?: string;
 }
 
 export interface VerifiedRefundEvent {
@@ -73,12 +73,12 @@ export interface VerifiedRefundEvent {
 
 export interface RefundCompletedEvent {
   eventId: string;
-  refundId: number;
-  paymentId: number;
-  orderId: number;
+  refundId: string;
+  paymentId: string;
+  orderId: string;
   orderNumber: string;
   customer: {
-    id: number;
+    id: string;
     name: string;
     email: string;
   };

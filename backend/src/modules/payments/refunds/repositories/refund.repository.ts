@@ -9,9 +9,9 @@ import type {
 } from '../interfaces/refund.interface';
 
 export interface RefundRepository {
-  findById(id: number): Promise<RefundView | null>;
+  findById(id: string): Promise<RefundView | null>;
   findByIdempotencyKey(idempotencyKey: string): Promise<RefundView | null>;
-  findAllByPaymentId(paymentId: number): Promise<RefundView[]>;
+  findAllByPaymentId(paymentId: string): Promise<RefundView[]>;
   findAll(query: RefundListQuery): Promise<PaginatedResult<RefundView>>;
   createForPayment(
     payment: PaymentView,

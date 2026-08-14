@@ -23,7 +23,7 @@ export interface AnalyticsOverview {
     orders: number;
   }>;
   topProducts: Array<{
-    productId: number | null;
+    productId: string | null;
     title: string;
     sku: string;
     unitsSold: number;

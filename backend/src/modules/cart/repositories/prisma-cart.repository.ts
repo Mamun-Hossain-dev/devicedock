@@ -8,7 +8,7 @@ const cartInclude = {
     orderBy: { createdAt: 'asc' as const },
     include: {
       product: {
-        include: { images: { orderBy: { id: 'asc' as const } } },
+        include: { images: { orderBy: { createdAt: 'asc' as const } } },
       },
     },
   },
@@ -18,7 +18,7 @@ const cartInclude = {
 export class PrismaCartRepository implements CartRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByUserId(userId: number): Promise<Cart | null> {
+  findByUserId(userId: string): Promise<Cart | null> {
     return this.prisma.cart.findUnique({
       where: { userId },
       include: cartInclude,
@@ -26,8 +26,8 @@ export class PrismaCartRepository implements CartRepository {
   }
 
   async setItemQuantity(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     quantity: number,
   ): Promise<Cart> {
     const cart = await this.prisma.cart.upsert({
@@ -47,7 +47,7 @@ export class PrismaCartRepository implements CartRepository {
     return (await this.findByUserId(userId)) as Cart;
   }
 
-  async removeItem(userId: number, productId: number): Promise<Cart> {
+  async removeItem(userId: string, productId: string): Promise<Cart> {
     const cart = await this.prisma.cart.findUnique({ where: { userId } });
 
     if (cart) {
@@ -58,14 +58,14 @@ export class PrismaCartRepository implements CartRepository {
 
     return (
       (await this.findByUserId(userId)) ?? {
-        id: 0,
+        id: null,
         userId,
         items: [],
       }
     );
   }
 
-  async clear(userId: number): Promise<Cart | null> {
+  async clear(userId: string): Promise<Cart | null> {
     const cart = await this.prisma.cart.findUnique({ where: { userId } });
     if (!cart) return null;
 

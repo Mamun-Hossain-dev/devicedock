@@ -53,14 +53,18 @@ export function AdminInventory() {
   const [stock, setStock] = useState<"all" | "low" | "out">("all");
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Product | null>(null);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(0);
   const [reason, setReason] = useState("Manual inventory count");
 
   const summary = useQuery({
     queryKey: ["operations", "summary"],
     queryFn: () =>
-      apiFetch<CatalogOperationsSummary>("/operations/summary", {}, accessToken),
+      apiFetch<CatalogOperationsSummary>(
+        "/operations/summary",
+        {},
+        accessToken,
+      ),
     enabled: Boolean(accessToken),
   });
 
@@ -197,9 +201,7 @@ export function AdminInventory() {
                 min={0}
                 max={1_000_000}
                 value={quantity}
-                onChange={(event) =>
-                  setQuantity(Number(event.target.value))
-                }
+                onChange={(event) => setQuantity(Number(event.target.value))}
               />
             </div>
             <div>
@@ -213,7 +215,10 @@ export function AdminInventory() {
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => adjust.mutate()} loading={adjust.isPending}>
+              <Button
+                onClick={() => adjust.mutate()}
+                loading={adjust.isPending}
+              >
                 Save adjustment
               </Button>
               <Button variant="outline" onClick={() => setEditing(null)}>
@@ -275,7 +280,9 @@ export function AdminInventory() {
             title="Inventory could not be loaded"
             description={inventory.error.message}
             action={
-              <Button onClick={() => void inventory.refetch()}>Try again</Button>
+              <Button onClick={() => void inventory.refetch()}>
+                Try again
+              </Button>
             }
           />
         ) : products.length === 0 ? (
@@ -392,7 +399,9 @@ function ProductRow({
             <p className="text-xs leading-5 text-black/55">
               <span
                 className={
-                  latest.change > 0 ? "font-bold text-emerald-700" : "text-black/55"
+                  latest.change > 0
+                    ? "font-bold text-emerald-700"
+                    : "text-black/55"
                 }
               >
                 {latest.change > 0 ? `+${latest.change}` : latest.change}
@@ -409,7 +418,11 @@ function ProductRow({
         </td>
         <td className="px-5 py-4">
           <div className="flex justify-end gap-2">
-            <Button variant="outline" className="h-9 px-3 text-xs" onClick={onAdjust}>
+            <Button
+              variant="outline"
+              className="h-9 px-3 text-xs"
+              onClick={onAdjust}
+            >
               Adjust
             </Button>
             <Button
@@ -485,8 +498,7 @@ function MovementHistory({ movements }: { movements: StockMovement[] }) {
 }
 
 function StockHealth({ quantity }: { quantity: number }) {
-  const tone =
-    quantity === 0 ? "danger" : quantity < 5 ? "warning" : "success";
+  const tone = quantity === 0 ? "danger" : quantity < 5 ? "warning" : "success";
   const barWidth = Math.min(quantity / 20, 1) * 100;
   return (
     <div className="w-32">

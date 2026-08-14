@@ -6,7 +6,7 @@ import {
   Patch,
   Post,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Query,
   Res,
   UseGuards,
@@ -39,7 +39,7 @@ export class OrdersController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Order fetched successfully')
-  findOneForAdmin(@Param('id', ParseIntPipe) id: number) {
+  findOneForAdmin(@Param('id', ParseUUIDPipe) id: string) {
     return this.ordersService.findOneForAdmin(id);
   }
 
@@ -48,7 +48,7 @@ export class OrdersController {
   @Roles(Role.ADMIN)
   @ResponseMessage('Order status updated successfully')
   updateStatusForAdmin(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
     return this.ordersService.updateStatusForAdmin(id, dto.status);
@@ -58,7 +58,7 @@ export class OrdersController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Order deleted successfully')
-  async deleteForAdmin(@Param('id', ParseIntPipe) id: number) {
+  async deleteForAdmin(@Param('id', ParseUUIDPipe) id: string) {
     await this.ordersService.deleteForAdmin(id);
     return null;
   }
@@ -67,7 +67,7 @@ export class OrdersController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Confirmation email resent successfully')
-  resendConfirmation(@Param('id', ParseIntPipe) id: number) {
+  resendConfirmation(@Param('id', ParseUUIDPipe) id: string) {
     return this.ordersService.resendConfirmationForAdmin(id);
   }
 
@@ -75,7 +75,7 @@ export class OrdersController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   async invoiceForAdmin(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Res() response: Response,
   ) {
     const invoice = await this.ordersService.generateInvoiceForAdmin(id);
@@ -92,7 +92,7 @@ export class OrdersController {
   @ResponseMessage('Order fetched successfully')
   findOne(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.ordersService.findOne(user.id, id);
   }
@@ -100,14 +100,14 @@ export class OrdersController {
   @Get(':id/invoice')
   async invoice(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Res() response: Response,
   ) {
     const invoice = await this.ordersService.generateInvoice(user.id, id);
     this.sendInvoice(response, invoice, id);
   }
 
-  private sendInvoice(response: Response, invoice: Buffer, id: number) {
+  private sendInvoice(response: Response, invoice: Buffer, id: string) {
     response.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="devicedock-order-${id}.pdf"`,

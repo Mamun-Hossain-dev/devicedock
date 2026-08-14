@@ -353,7 +353,7 @@ export function AdminReviews() {
     enabled: Boolean(accessToken),
   });
   const moderate = useMutation({
-    mutationFn: ({ id, next }: { id: number; next: "APPROVED" | "REJECTED" }) =>
+    mutationFn: ({ id, next }: { id: string; next: "APPROVED" | "REJECTED" }) =>
       apiFetch(
         `/operations/reviews/${id}`,
         { method: "PATCH", body: JSON.stringify({ status: next }) },
@@ -518,7 +518,7 @@ export function AdminCoupons() {
     onError: (error: Error) => toast.error(error.message),
   });
   const update = useMutation({
-    mutationFn: ({ id, isActive }: { id: number; isActive: boolean }) =>
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
       apiFetch(
         `/operations/coupons/${id}`,
         { method: "PATCH", body: JSON.stringify({ isActive }) },
@@ -529,7 +529,7 @@ export function AdminCoupons() {
     onError: (error: Error) => toast.error(error.message),
   });
   const remove = useMutation({
-    mutationFn: (id: number) =>
+    mutationFn: (id: string) =>
       apiFetch(`/operations/coupons/${id}`, { method: "DELETE" }, accessToken),
     onSuccess: async () => {
       toast.success("Coupon deleted");

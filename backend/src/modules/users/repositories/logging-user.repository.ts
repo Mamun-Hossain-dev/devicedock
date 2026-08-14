@@ -41,24 +41,24 @@ export class LoggingUserRepository implements UserRepository {
     return this.repo.create(input, image);
   }
 
-  async update(id: number, input: UpdateUserInput, image?: UserProfileImage) {
+  async update(id: string, input: UpdateUserInput, image?: UserProfileImage) {
     this.logger.log(`Updating user ${id}`);
 
     return this.repo.update(id, input, image);
   }
 
-  async setBlocked(id: number, isBlocked: boolean) {
+  async setBlocked(id: string, isBlocked: boolean) {
     this.logger.log(`${isBlocked ? 'Blocking' : 'Unblocking'} user ${id}`);
 
     return this.repo.setBlocked(id, isBlocked);
   }
 
-  async linkGoogleAccount(id: number, googleId: string) {
+  async linkGoogleAccount(id: string, googleId: string) {
     this.logger.log(`Linking Google identity to user ${id}`);
     return this.repo.linkGoogleAccount(id, googleId);
   }
 
-  async updateProfileImage(id: number, image: UserProfileImage | null) {
+  async updateProfileImage(id: string, image: UserProfileImage | null) {
     this.logger.log(
       `${image ? 'Updating' : 'Removing'} user ${id} profile image`,
     );
@@ -66,18 +66,18 @@ export class LoggingUserRepository implements UserRepository {
     return this.repo.updateProfileImage(id, image);
   }
 
-  async updatePassword(id: number, password: string) {
+  async updatePassword(id: string, password: string) {
     this.logger.log(`Updating password for user ${id}`);
     return this.repo.updatePassword(id, password);
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     this.logger.log(`Deleting user ${id}`);
 
     return this.repo.delete(id);
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     return this.repo.findById(id);
   }
 

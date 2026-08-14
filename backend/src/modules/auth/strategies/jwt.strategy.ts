@@ -2,6 +2,7 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { isUUID } from 'class-validator';
 import type { UserRepository } from '../../users/repositories/user.repository';
 import { toPublicUser } from '../../users/utils/public-user.util';
 import { JwtPayload } from '../interfaces/auth.interface';
@@ -22,6 +23,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload) {
+    if (!isUUID(payload.sub)) {
+      throw new UnauthorizedException('Invalid token subject');
+    }
+
     const user = await this.userRepository.findById(payload.sub);
 
     if (!user) {

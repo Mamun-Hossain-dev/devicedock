@@ -23,9 +23,8 @@ const checkoutPaymentMethods = ['CARD', 'CASH_ON_DELIVERY'] as const;
 const deliveryZones = ['DHAKA', 'OUTSIDE_DHAKA'] as const;
 
 export class CheckoutItemDto {
-  @IsInt()
-  @Min(1)
-  productId!: number;
+  @IsUUID()
+  productId!: string;
 
   @IsInt()
   @Min(1)

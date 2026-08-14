@@ -42,7 +42,7 @@ export function AdminContactMessages() {
     placeholderData: (previous) => previous,
   });
   const updateStatus = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: ContactStatus }) =>
+    mutationFn: ({ id, status }: { id: string; status: ContactStatus }) =>
       apiFetch<ContactMessage>(
         `/contact-messages/${id}/status`,
         { method: "PATCH", body: JSON.stringify({ status }) },

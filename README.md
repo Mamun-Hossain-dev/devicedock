@@ -38,6 +38,8 @@ Install dependencies inside each directory so their lockfiles remain separate.
 - Password changes and per-device Redis session revocation
 - Feature-first modular architecture and dependency injection
 - Repository pattern for persistence boundaries
+- PostgreSQL-native UUID primary and foreign keys; Prisma generates
+  time-ordered UUIDv7 identifiers for new records
 - Redis detail, collection, and short-lived catalog-list caches with write
   invalidation, plus throttling and distributed checkout locks
 - Stripe Payment Intent, webhook verification, and idempotent payment handling
@@ -55,6 +57,9 @@ Install dependencies inside each directory so their lockfiles remain separate.
 - RabbitMQ RPC for immediate Payment Intent creation responses
 - RabbitMQ event processing with manual acknowledgements, retries, and DLQs
 - Idempotent email, notification, and analytics consumers
+- Branded DeviceDock email templates (welcome, payment confirmation, admin
+  new-order, refund confirmation, and newsletter) with store links and clear
+  next-step actions
 - Payment confirmation email with an attached PDF invoice
 - Admin new-order email with customer, delivery, product, and payment details
 - Admin fulfilment workflow with one-click fulfillment (direct to delivered),
@@ -85,7 +90,8 @@ chain. PostgreSQL remains the source of truth; Redis is limited to caching,
 sessions, throttling, and short-lived coordination locks. Public catalog lists
 use deterministic one-minute cache keys and concurrent cache misses share one
 database load; every product write invalidates affected list and collection
-caches.
+caches. Database entities use native PostgreSQL UUID columns; UUIDv7 generation
+keeps identifiers decentralized while retaining index-friendly insertion order.
 
 ## Payment flow
 
@@ -214,7 +220,8 @@ Configure `backend/.env` using its example. Important groups are PostgreSQL,
 Redis, RabbitMQ, JWT, Cloudinary, SMTP, and Stripe. When Stripe is enabled,
 `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are required by startup
 validation. When email is enabled, `MAIL_ADMIN_TO` receives confirmed-order
-notifications.
+notifications and `MAIL_SITE_URL` (default `http://localhost:3000`) sets the
+storefront links used inside email templates.
 
 For local Stripe webhooks:
 
@@ -256,52 +263,52 @@ PostgreSQL is provided by the configured Neon/database connection. Local tools:
 
 All routes are relative to `/api/v1`.
 
-| Method | Route                           | Access           | Purpose                        |
-| ------ | ------------------------------- | ---------------- | ------------------------------ |
-| POST   | `/auth/register`                | Public           | Register                       |
-| POST   | `/auth/login`                   | Public           | Sign in                        |
-| POST   | `/auth/refresh`                 | Refresh cookie   | Rotate session                 |
-| GET    | `/auth/sessions`                | Authenticated    | List active sessions           |
-| DELETE | `/auth/sessions/:id`            | Owner            | Revoke an active session       |
-| PATCH  | `/users/me/password`            | Authenticated    | Change account password        |
-| GET    | `/account/addresses`            | Authenticated    | List saved addresses           |
-| POST   | `/account/addresses`            | Authenticated    | Save a delivery address        |
-| GET    | `/account/wishlist`             | Authenticated    | List saved products            |
-| POST   | `/account/wishlist`             | Authenticated    | Save a product                 |
-| GET    | `/account/notifications`        | Authenticated    | Read account notifications     |
-| GET    | `/products`                     | Public           | Search and filter products     |
-| POST   | `/products`                     | Admin, Seller    | Create a product               |
-| PATCH  | `/products/:id`                 | Admin, Seller    | Update a product               |
-| POST   | `/payments/checkout`            | Authenticated    | Create or resume checkout      |
-| GET    | `/payments/:id`                 | Owner            | Read webhook-backed status     |
-| GET    | `/payments/:id/session`         | Owner            | Restore checkout session       |
-| POST   | `/payments/webhooks/stripe`     | Stripe signature | Process webhook                |
-| POST   | `/refunds`                      | Admin            | Request a refund               |
-| GET    | `/refunds`                      | Admin            | List refunds                   |
-| GET    | `/refunds/:id`                  | Admin            | Read a refund                  |
-| POST   | `/refund-requests`              | Authenticated    | Request a refund for an order  |
-| GET    | `/refund-requests`              | Authenticated    | List owned refund requests     |
-| GET    | `/refund-requests/:id`          | Owner            | Read an owned refund request   |
-| GET    | `/refund-requests/admin`        | Admin            | List all refund requests       |
-| PATCH  | `/refund-requests/admin/:id/approve` | Admin      | Approve and refund (full or chosen amount) |
-| PATCH  | `/refund-requests/admin/:id/deny` | Admin          | Deny a refund request          |
-| GET    | `/orders`                       | Authenticated    | List owned orders              |
-| GET    | `/orders/:id`                   | Owner            | Read owned order               |
-| GET    | `/orders/:id/invoice`           | Owner            | Download paid invoice          |
-| GET    | `/orders/admin/list`            | Admin            | List all orders                |
-| GET    | `/orders/admin/:id`             | Admin            | Read any order                 |
-| PATCH  | `/orders/admin/:id/status`      | Admin            | Update fulfilment status       |
-| POST   | `/orders/admin/:id/resend-confirmation` | Admin   | Resend confirmation email      |
-| GET    | `/orders/admin/:id/invoice`     | Admin            | Download paid invoice          |
-| DELETE | `/orders/admin/:id`             | Admin            | Delete pending/cancelled order |
-| GET    | `/operations/summary`           | Admin, Seller    | Catalog operation metrics      |
-| GET    | `/operations/analytics`         | Admin            | Revenue and sales analytics    |
-| GET    | `/operations/inventory`         | Admin, Seller    | Inventory list with stock view |
-| PATCH  | `/operations/inventory/:id`     | Admin, Seller    | Record a stock adjustment      |
-| GET    | `/operations/inventory/:id/movements` | Admin, Seller | Product stock history     |
-| GET    | `/operations/reviews`           | Admin            | Moderate customer reviews      |
-| GET    | `/operations/coupons/available` | Public           | List currently usable coupons  |
-| POST   | `/operations/coupons`           | Admin            | Create a checkout coupon       |
+| Method | Route                                   | Access           | Purpose                                    |
+| ------ | --------------------------------------- | ---------------- | ------------------------------------------ |
+| POST   | `/auth/register`                        | Public           | Register                                   |
+| POST   | `/auth/login`                           | Public           | Sign in                                    |
+| POST   | `/auth/refresh`                         | Refresh cookie   | Rotate session                             |
+| GET    | `/auth/sessions`                        | Authenticated    | List active sessions                       |
+| DELETE | `/auth/sessions/:id`                    | Owner            | Revoke an active session                   |
+| PATCH  | `/users/me/password`                    | Authenticated    | Change account password                    |
+| GET    | `/account/addresses`                    | Authenticated    | List saved addresses                       |
+| POST   | `/account/addresses`                    | Authenticated    | Save a delivery address                    |
+| GET    | `/account/wishlist`                     | Authenticated    | List saved products                        |
+| POST   | `/account/wishlist`                     | Authenticated    | Save a product                             |
+| GET    | `/account/notifications`                | Authenticated    | Read account notifications                 |
+| GET    | `/products`                             | Public           | Search and filter products                 |
+| POST   | `/products`                             | Admin, Seller    | Create a product                           |
+| PATCH  | `/products/:id`                         | Admin, Seller    | Update a product                           |
+| POST   | `/payments/checkout`                    | Authenticated    | Create or resume checkout                  |
+| GET    | `/payments/:id`                         | Owner            | Read webhook-backed status                 |
+| GET    | `/payments/:id/session`                 | Owner            | Restore checkout session                   |
+| POST   | `/payments/webhooks/stripe`             | Stripe signature | Process webhook                            |
+| POST   | `/refunds`                              | Admin            | Request a refund                           |
+| GET    | `/refunds`                              | Admin            | List refunds                               |
+| GET    | `/refunds/:id`                          | Admin            | Read a refund                              |
+| POST   | `/refund-requests`                      | Authenticated    | Request a refund for an order              |
+| GET    | `/refund-requests`                      | Authenticated    | List owned refund requests                 |
+| GET    | `/refund-requests/:id`                  | Owner            | Read an owned refund request               |
+| GET    | `/refund-requests/admin`                | Admin            | List all refund requests                   |
+| PATCH  | `/refund-requests/admin/:id/approve`    | Admin            | Approve and refund (full or chosen amount) |
+| PATCH  | `/refund-requests/admin/:id/deny`       | Admin            | Deny a refund request                      |
+| GET    | `/orders`                               | Authenticated    | List owned orders                          |
+| GET    | `/orders/:id`                           | Owner            | Read owned order                           |
+| GET    | `/orders/:id/invoice`                   | Owner            | Download paid invoice                      |
+| GET    | `/orders/admin/list`                    | Admin            | List all orders                            |
+| GET    | `/orders/admin/:id`                     | Admin            | Read any order                             |
+| PATCH  | `/orders/admin/:id/status`              | Admin            | Update fulfilment status                   |
+| POST   | `/orders/admin/:id/resend-confirmation` | Admin            | Resend confirmation email                  |
+| GET    | `/orders/admin/:id/invoice`             | Admin            | Download paid invoice                      |
+| DELETE | `/orders/admin/:id`                     | Admin            | Delete pending/cancelled order             |
+| GET    | `/operations/summary`                   | Admin, Seller    | Catalog operation metrics                  |
+| GET    | `/operations/analytics`                 | Admin            | Revenue and sales analytics                |
+| GET    | `/operations/inventory`                 | Admin, Seller    | Inventory list with stock view             |
+| PATCH  | `/operations/inventory/:id`             | Admin, Seller    | Record a stock adjustment                  |
+| GET    | `/operations/inventory/:id/movements`   | Admin, Seller    | Product stock history                      |
+| GET    | `/operations/reviews`                   | Admin            | Moderate customer reviews                  |
+| GET    | `/operations/coupons/available`         | Public           | List currently usable coupons              |
+| POST   | `/operations/coupons`                   | Admin            | Create a checkout coupon                   |
 
 Checkout requires a client-generated UUID that remains stable across retries
 and the selected cart items. Prices and totals are always loaded by the
@@ -321,8 +328,14 @@ backend:
   "deliveryPostalCode": "1209",
   "couponCode": "SAVE10",
   "items": [
-    { "productId": 12, "quantity": 1 },
-    { "productId": 28, "quantity": 2 }
+    {
+      "productId": "0198f15f-d921-7d24-8dc1-2ff3fb804191",
+      "quantity": 1
+    },
+    {
+      "productId": "0198f160-6ef4-72df-9db8-7c796f129df1",
+      "quantity": 2
+    }
   ]
 }
 ```

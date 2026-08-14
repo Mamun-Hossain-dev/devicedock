@@ -16,8 +16,8 @@ export type CheckoutPaymentMethod = 'CARD' | 'CASH_ON_DELIVERY';
 export type DeliveryZone = 'DHAKA' | 'OUTSIDE_DHAKA';
 
 export interface OrderItemView {
-  id: number;
-  productId: number | null;
+  id: string;
+  productId: string | null;
   productTitle: string;
   productSku: string;
   unitAmount: number;
@@ -26,9 +26,9 @@ export interface OrderItemView {
 }
 
 export interface OrderView {
-  id: number;
+  id: string;
   orderNumber: string;
-  userId: number;
+  userId: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -36,7 +36,7 @@ export interface OrderView {
   deliveryArea: string;
   deliveryCity: string;
   deliveryPostalCode: string | null;
-  couponId: number | null;
+  couponId: string | null;
   couponCode: string | null;
   paymentMethod: CheckoutPaymentMethod;
   deliveryZone: DeliveryZone;
@@ -53,8 +53,8 @@ export interface OrderView {
 }
 
 export interface PaymentView {
-  id: number;
-  orderId: number;
+  id: string;
+  orderId: string;
   status: PaymentStatus;
   amount: number;
   currency: string;
@@ -74,9 +74,9 @@ export type PublicPaymentView = Omit<
 >;
 
 export interface CheckoutSession {
-  paymentId: number;
+  paymentId: string;
   paymentIntentId: string;
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   clientSecret: string;
   amount: number;
@@ -93,13 +93,13 @@ export interface CheckoutSession {
 }
 
 export interface CheckoutCustomer {
-  id: number;
+  id: string;
   name: string;
   email: string;
 }
 
 export interface CheckoutItemInput {
-  productId: number;
+  productId: string;
   quantity: number;
 }
 
@@ -118,11 +118,11 @@ export interface CheckoutOptions {
 
 export interface PaymentSucceededEvent {
   eventId: string;
-  orderId: number;
+  orderId: string;
   orderNumber: string;
-  paymentId: number;
+  paymentId: string;
   customer: {
-    id: number;
+    id: string;
     name: string;
     email: string;
     phone: string;

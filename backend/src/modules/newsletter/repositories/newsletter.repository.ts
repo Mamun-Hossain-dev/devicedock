@@ -23,9 +23,9 @@ export interface NewsletterRepository {
     input: CreateBroadcastInput,
   ): Promise<BroadcastWithDeliveries>;
   updateDelivery(
-    id: number,
+    id: string,
     status: DeliveryStatus,
     error?: string,
   ): Promise<void>;
-  completeBroadcast(id: number): Promise<NewsletterBroadcast>;
+  completeBroadcast(id: string): Promise<NewsletterBroadcast>;
 }

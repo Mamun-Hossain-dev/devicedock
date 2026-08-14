@@ -9,19 +9,19 @@ import type { RefundStatus } from '../../payments/refunds/interfaces/refund.inte
 export type RefundRequestStatus = 'PENDING' | 'APPROVED' | 'DENIED';
 
 export interface RefundRequestView {
-  id: number;
-  orderId: number;
-  userId: number;
+  id: string;
+  orderId: string;
+  userId: string;
   reason: string;
   status: RefundRequestStatus;
-  refundId: number | null;
-  adminId: number | null;
+  refundId: string | null;
+  adminId: string | null;
   decisionNote: string | null;
   reviewedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
   order: {
-    id: number;
+    id: string;
     orderNumber: string;
     status: OrderStatus;
     totalAmount: number;
@@ -31,7 +31,7 @@ export interface RefundRequestView {
     paymentMethod: CheckoutPaymentMethod;
   };
   refund: {
-    id: number;
+    id: string;
     amount: number;
     currency: string;
     status: RefundStatus;
@@ -39,10 +39,10 @@ export interface RefundRequestView {
 }
 
 export interface RefundableOrder {
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   orderStatus: OrderStatus;
-  paymentId: number | null;
+  paymentId: string | null;
   paymentStatus: PaymentStatus | null;
   refundable: boolean;
 }
@@ -51,7 +51,7 @@ export interface RefundRequestListQuery {
   page: number;
   limit: number;
   status?: RefundRequestStatus;
-  orderId?: number;
+  orderId?: string;
 }
 
 export type RefundRequestListResult = PaginatedResult<RefundRequestView>;

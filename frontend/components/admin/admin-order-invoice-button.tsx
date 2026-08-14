@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useMutation } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
-import { toast } from 'sonner';
-import { useAuth } from '@/components/auth-provider';
-import { Button } from '@/components/ui/button';
-import { apiFetchBlob } from '@/lib/api';
+import { useMutation } from "@tanstack/react-query";
+import { Download } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/components/auth-provider";
+import { Button } from "@/components/ui/button";
+import { apiFetchBlob } from "@/lib/api";
 
 export function AdminOrderInvoiceButton({
   orderId,
   orderNumber,
   compact = false,
 }: {
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   compact?: boolean;
 }) {
@@ -22,7 +22,7 @@ export function AdminOrderInvoiceButton({
       apiFetchBlob(`/orders/admin/${orderId}/invoice`, accessToken),
     onSuccess: (blob) => {
       const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
+      const anchor = document.createElement("a");
       anchor.href = url;
       anchor.download = `devicedock-${orderNumber}.pdf`;
       anchor.click();
@@ -34,11 +34,11 @@ export function AdminOrderInvoiceButton({
   return (
     <Button
       variant="outline"
-      className={compact ? 'h-9 px-3 text-xs' : undefined}
+      className={compact ? "h-9 px-3 text-xs" : undefined}
       loading={invoice.isPending}
       onClick={() => invoice.mutate()}
     >
-      <Download size={15} /> {compact ? 'Invoice' : 'Download invoice'}
+      <Download size={15} /> {compact ? "Invoice" : "Download invoice"}
     </Button>
   );
 }

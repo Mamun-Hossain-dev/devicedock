@@ -9,4 +9,5 @@ export default registerAs('email', () => ({
   password: process.env.SMTP_PASSWORD ?? '',
   from: process.env.MAIL_FROM ?? '',
   adminTo: process.env.MAIL_ADMIN_TO ?? '',
+  siteUrl: process.env.MAIL_SITE_URL ?? 'http://localhost:3000',
 }));

@@ -48,7 +48,7 @@ export class UserService {
     );
   }
 
-  async getUserById(id: number): Promise<PublicUser> {
+  async getUserById(id: string): Promise<PublicUser> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new AppException('User not found', {
@@ -90,7 +90,7 @@ export class UserService {
   }
 
   async updateUser(
-    id: number,
+    id: string,
     user: UpdateUserInput,
     file?: FileToStore,
   ): Promise<PublicUser> {
@@ -126,7 +126,7 @@ export class UserService {
     return toPublicUser(updatedUser);
   }
 
-  async setUserBlocked(id: number, isBlocked: boolean): Promise<PublicUser> {
+  async setUserBlocked(id: string, isBlocked: boolean): Promise<PublicUser> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new AppException('User not found', {
@@ -153,7 +153,7 @@ export class UserService {
     return toPublicUser(updatedUser);
   }
 
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: string): Promise<void> {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new AppException('User not found', {
@@ -167,7 +167,7 @@ export class UserService {
   }
 
   async updateProfileImage(
-    userId: number,
+    userId: string,
     file: FileToStore,
   ): Promise<PublicUser> {
     const user = await this.requireUser(userId);
@@ -189,7 +189,7 @@ export class UserService {
     }
   }
 
-  async removeProfileImage(userId: number): Promise<PublicUser> {
+  async removeProfileImage(userId: string): Promise<PublicUser> {
     const user = await this.requireUser(userId);
     const updatedUser = await this.userRepository.updateProfileImage(
       userId,
@@ -203,7 +203,7 @@ export class UserService {
   }
 
   async changePassword(
-    userId: number,
+    userId: string,
     currentPassword: string,
     newPassword: string,
   ): Promise<void> {
@@ -225,7 +225,7 @@ export class UserService {
     if (!updated) throw this.userNotFoundException();
   }
 
-  private async requireUser(id: number) {
+  private async requireUser(id: string) {
     const user = await this.userRepository.findById(id);
     if (!user) throw this.userNotFoundException();
     return user;

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -7,10 +7,12 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react';
-import type { CartItem, Product } from '@/lib/types';
+} from "react";
+import type { CartItem, Product } from "@/lib/types";
 
-const CART_STORAGE_KEY = 'devicedock-cart';
+const CART_STORAGE_KEY = "devicedock-cart";
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 interface CartContextValue {
   items: CartItem[];
@@ -18,9 +20,9 @@ interface CartContextValue {
   itemCount: number;
   subtotal: number;
   addItem(product: Product, quantity: number): void;
-  updateQuantity(productId: number, quantity: number): void;
-  removeItem(productId: number): void;
-  removeItems(productIds: number[]): void;
+  updateQuantity(productId: string, quantity: number): void;
+  removeItem(productId: string): void;
+  removeItems(productIds: string[]): void;
   clear(): void;
 }
 
@@ -70,7 +72,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const updateQuantity = useCallback((productId: number, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
     setItems((current) =>
       current.map((item) =>
         item.productId === productId
@@ -83,13 +85,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const removeItem = useCallback((productId: number) => {
+  const removeItem = useCallback((productId: string) => {
     setItems((current) =>
       current.filter((item) => item.productId !== productId),
     );
   }, []);
 
-  const removeItems = useCallback((productIds: number[]) => {
+  const removeItems = useCallback((productIds: string[]) => {
     const ids = new Set(productIds);
     setItems((current) => current.filter((item) => !ids.has(item.productId)));
   }, []);
@@ -118,7 +120,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext);
-  if (!context) throw new Error('useCart must be used within CartProvider');
+  if (!context) throw new Error("useCart must be used within CartProvider");
   return context;
 }
 
@@ -133,10 +135,11 @@ function parseStoredCart(value: string): CartItem[] {
 }
 
 function isCartItem(value: unknown): value is CartItem {
-  if (!value || typeof value !== 'object') return false;
+  if (!value || typeof value !== "object") return false;
   const item = value as Partial<CartItem>;
   return (
-    Number.isInteger(item.productId) &&
+    typeof item.productId === "string" &&
+    UUID_PATTERN.test(item.productId) &&
     Number.isInteger(item.quantity) &&
     Number(item.quantity) > 0 &&
     Boolean(item.product) &&

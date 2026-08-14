@@ -14,7 +14,7 @@ enum ProductStatus {
 }
 
 model Product {
-  id               Int             @id @default(autoincrement())
+  id               String          @id @default(uuid(7)) @db.Uuid
   slug             String          @unique
   sku              String          @unique
   title            String
@@ -53,10 +53,10 @@ model Product {
 }
 
 model StockMovement {
-  id            Int      @id @default(autoincrement())
-  productId     Int
+  id            String   @id @default(uuid(7)) @db.Uuid
+  productId     String   @db.Uuid
   product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  adjustedById  Int
+  adjustedById  String   @db.Uuid
   adjustedBy    User     @relation(fields: [adjustedById], references: [id], onDelete: Restrict)
   previousStock Int
   newStock      Int
@@ -70,10 +70,10 @@ model StockMovement {
 }
 
 model ProductImage {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid(7)) @db.Uuid
   url       String
   publicId  String   @unique
-  productId Int
+  productId String   @db.Uuid
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
@@ -82,8 +82,8 @@ model ProductImage {
 }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
-  userId    Int        @unique
+  id        String     @id @default(uuid(7)) @db.Uuid
+  userId    String     @unique @db.Uuid
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     CartItem[]
   createdAt DateTime   @default(now())
@@ -93,9 +93,9 @@ model Cart {
 }
 
 model CartItem {
-  id        Int      @id @default(autoincrement())
-  cartId    Int
-  productId Int
+  id        String   @id @default(uuid(7)) @db.Uuid
+  cartId    String   @db.Uuid
+  productId String   @db.Uuid
   quantity  Int
   cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)

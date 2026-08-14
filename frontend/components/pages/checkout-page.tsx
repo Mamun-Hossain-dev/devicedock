@@ -63,7 +63,7 @@ function CheckoutContent() {
   const paymentId = searchParams.get("paymentId");
   const { accessToken, user } = useAuth();
   const { items, hydrated } = useCart();
-  const [selectedIds, setSelectedIds] = useState<number[] | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[] | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<
     "CARD" | "CASH_ON_DELIVERY"
   >("CARD");
@@ -71,7 +71,7 @@ function CheckoutContent() {
     "DHAKA",
   );
   const [couponCode, setCouponCode] = useState("");
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null,
   );
   const [addressesInitialized, setAddressesInitialized] = useState(false);
@@ -670,7 +670,7 @@ function StripePaymentForm({
   paymentId,
   paymentMethod,
 }: {
-  paymentId: number;
+  paymentId: string;
   paymentMethod: "CARD" | "CASH_ON_DELIVERY";
 }) {
   const stripe = useStripe();
@@ -765,7 +765,7 @@ function formatCouponDiscount(coupon: PublicCoupon): string {
 
 function updateDeliveryDetail(
   setDetails: Dispatch<SetStateAction<DeliveryDetails>>,
-  setSelectedAddressId: Dispatch<SetStateAction<number | null>>,
+  setSelectedAddressId: Dispatch<SetStateAction<string | null>>,
   field: keyof DeliveryDetails,
   value: string,
 ) {
@@ -818,23 +818,25 @@ function CheckoutError({ message }: { message: string }) {
   );
 }
 
-function readSelectedProductIds(): number[] {
+function readSelectedProductIds(): string[] {
   try {
     const value = JSON.parse(
       window.sessionStorage.getItem(CHECKOUT_SELECTION_KEY) ?? "[]",
     ) as unknown;
     return Array.isArray(value)
-      ? value.filter((id): id is number => Number.isInteger(id))
+      ? value.filter(
+          (id): id is string => typeof id === "string" && id.length > 0,
+        )
       : [];
   } catch {
     return [];
   }
 }
 
-function readPaymentId(details: unknown): number | null {
+function readPaymentId(details: unknown): string | null {
   if (!details || typeof details !== "object") return null;
   const paymentId = (details as { paymentId?: unknown }).paymentId;
-  return typeof paymentId === "number" && Number.isInteger(paymentId)
+  return typeof paymentId === "string" && paymentId.length > 0
     ? paymentId
     : null;
 }

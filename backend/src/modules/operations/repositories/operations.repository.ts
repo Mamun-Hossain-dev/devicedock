@@ -11,21 +11,21 @@ import type {
 export interface OperationsRepository {
   getInventory(query: InventoryQueryDto): Promise<unknown>;
   getProductMovements(
-    productId: number,
+    productId: string,
     query: PaginationQueryDto,
   ): Promise<unknown>;
   getAnalytics(): Promise<AnalyticsOverview>;
   createReview(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     input: CreateReviewDto,
   ): Promise<unknown>;
-  getProductReviews(productId: number): Promise<unknown>;
+  getProductReviews(productId: string): Promise<unknown>;
   getReviews(query: ReviewQueryDto): Promise<unknown>;
-  moderateReview(id: number, status: 'APPROVED' | 'REJECTED'): Promise<unknown>;
+  moderateReview(id: string, status: 'APPROVED' | 'REJECTED'): Promise<unknown>;
   getCoupons(): Promise<unknown>;
   getAvailableCoupons(): Promise<unknown>;
   createCoupon(input: CreateCouponDto): Promise<unknown>;
-  updateCoupon(id: number, input: UpdateCouponDto): Promise<unknown>;
-  deleteCoupon(id: number): Promise<void>;
+  updateCoupon(id: string, input: UpdateCouponDto): Promise<unknown>;
+  deleteCoupon(id: string): Promise<void>;
 }

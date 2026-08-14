@@ -12,7 +12,7 @@ export class CachedCartRepository implements CartRepository {
     private readonly repository: CartRepository,
   ) {}
 
-  async findByUserId(userId: number): Promise<Cart | null> {
+  async findByUserId(userId: string): Promise<Cart | null> {
     const cached = await this.redis.get(this.key(userId));
     if (cached) return JSON.parse(cached) as Cart;
 
@@ -22,8 +22,8 @@ export class CachedCartRepository implements CartRepository {
   }
 
   async setItemQuantity(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     quantity: number,
   ): Promise<Cart> {
     const cart = await this.repository.setItemQuantity(
@@ -35,13 +35,13 @@ export class CachedCartRepository implements CartRepository {
     return cart;
   }
 
-  async removeItem(userId: number, productId: number): Promise<Cart> {
+  async removeItem(userId: string, productId: string): Promise<Cart> {
     const cart = await this.repository.removeItem(userId, productId);
     await this.cache(cart);
     return cart;
   }
 
-  async clear(userId: number): Promise<Cart | null> {
+  async clear(userId: string): Promise<Cart | null> {
     const cart = await this.repository.clear(userId);
     await this.redis.del(this.key(userId));
     return cart;
@@ -55,7 +55,7 @@ export class CachedCartRepository implements CartRepository {
     );
   }
 
-  private key(userId: number): string {
+  private key(userId: string): string {
     return `cart:user:${userId}`;
   }
 }

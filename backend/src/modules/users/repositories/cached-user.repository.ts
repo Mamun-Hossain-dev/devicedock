@@ -58,7 +58,7 @@ export class CachedUserRepository implements UserRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateUserInput,
     image?: UserProfileImage,
   ): Promise<User | null> {
@@ -78,7 +78,7 @@ export class CachedUserRepository implements UserRepository {
     return user;
   }
 
-  async setBlocked(id: number, isBlocked: boolean): Promise<User | null> {
+  async setBlocked(id: string, isBlocked: boolean): Promise<User | null> {
     const existingUser = await this.repository.findById(id);
     const user = await this.repository.setBlocked(id, isBlocked);
 
@@ -94,7 +94,7 @@ export class CachedUserRepository implements UserRepository {
     return user;
   }
 
-  async linkGoogleAccount(id: number, googleId: string): Promise<User | null> {
+  async linkGoogleAccount(id: string, googleId: string): Promise<User | null> {
     const existingUser = await this.repository.findById(id);
     const user = await this.repository.linkGoogleAccount(id, googleId);
 
@@ -106,7 +106,7 @@ export class CachedUserRepository implements UserRepository {
   }
 
   async updateProfileImage(
-    id: number,
+    id: string,
     image: UserProfileImage | null,
   ): Promise<User | null> {
     const existingUser = await this.repository.findById(id);
@@ -120,7 +120,7 @@ export class CachedUserRepository implements UserRepository {
     return user;
   }
 
-  async updatePassword(id: number, password: string): Promise<User | null> {
+  async updatePassword(id: string, password: string): Promise<User | null> {
     const existingUser = await this.repository.findById(id);
     const user = await this.repository.updatePassword(id, password);
     if (!user) return null;
@@ -129,7 +129,7 @@ export class CachedUserRepository implements UserRepository {
     return user;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const existingUser = await this.repository.findById(id);
 
     await this.repository.delete(id);
@@ -139,7 +139,7 @@ export class CachedUserRepository implements UserRepository {
     }
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     const cacheKey = this.getIdCacheKey(id);
     const cacheUser = await this.redis.get(cacheKey);
 
@@ -197,7 +197,7 @@ export class CachedUserRepository implements UserRepository {
     ]);
   }
 
-  private getIdCacheKey(id: number): string {
+  private getIdCacheKey(id: string): string {
     return `user:id:${id}`;
   }
 

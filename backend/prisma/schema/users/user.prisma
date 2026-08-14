@@ -5,7 +5,7 @@ enum Role {
 }
 
 model User {
-  id                     Int                     @id @default(autoincrement())
+  id                     String                  @id @default(uuid(7)) @db.Uuid
   name                   String
   email                  String                  @unique
   phone                  String?
@@ -22,9 +22,9 @@ model User {
   reviews                Review[]
   stockMovements         StockMovement[]
   couponRedemptions      CouponRedemption[]
-  requestedRefunds        Refund[]
-  refundRequests          RefundRequest[]
-  reviewedRefundRequests  RefundRequest[]   @relation("RefundRequestReviewer")
+  requestedRefunds       Refund[]
+  refundRequests         RefundRequest[]
+  reviewedRefundRequests RefundRequest[]         @relation("RefundRequestReviewer")
   newsletterSubscriber   NewsletterSubscriber?
   addresses              Address[]
   wishlistItems          WishlistItem[]
@@ -37,8 +37,8 @@ model User {
 }
 
 model Address {
-  id            Int          @id @default(autoincrement())
-  userId        Int
+  id            String       @id @default(uuid(7)) @db.Uuid
+  userId        String       @db.Uuid
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   label         String
   recipientName String
@@ -57,10 +57,10 @@ model Address {
 }
 
 model WishlistItem {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productId Int
+  productId String   @db.Uuid
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
@@ -70,8 +70,8 @@ model WishlistItem {
 }
 
 model NotificationPreference {
-  id             Int      @id @default(autoincrement())
-  userId         Int      @unique
+  id             String   @id @default(uuid(7)) @db.Uuid
+  userId         String   @unique @db.Uuid
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderUpdates   Boolean  @default(true)
   productUpdates Boolean  @default(true)
@@ -83,8 +83,8 @@ model NotificationPreference {
 }
 
 model Notification {
-  id        Int       @id @default(autoincrement())
-  userId    Int
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @db.Uuid
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      String
   title     String

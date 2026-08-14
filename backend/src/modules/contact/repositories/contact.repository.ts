@@ -12,7 +12,7 @@ export interface ContactRepository {
     options: ContactListOptions,
   ): Promise<RepositoryPaginatedResult<ContactMessage>>;
   updateStatus(
-    id: number,
+    id: string,
     status: ContactStatus,
   ): Promise<ContactMessage | null>;
 }

@@ -45,7 +45,7 @@ export function OrdersPage() {
       orderId,
       orderNumber,
     }: {
-      orderId: number;
+      orderId: string;
       orderNumber: string;
     }) => ({
       blob: await apiFetchBlob(`/orders/${orderId}/invoice`, accessToken),
@@ -234,12 +234,13 @@ export function OrdersPage() {
         onOpenChange={(open) => {
           if (!open) setRefundFor(null);
         }}
-        orderId={refundFor?.id ?? 0}
+        orderId={refundFor?.id ?? ""}
         orderNumber={refundFor?.orderNumber ?? ""}
         amount={
-          refundFor?.payments?.find(
-            (payment) => payment.status === "SUCCEEDED",
-          )?.amount ?? refundFor?.totalAmount ?? 0
+          refundFor?.payments?.find((payment) => payment.status === "SUCCEEDED")
+            ?.amount ??
+          refundFor?.totalAmount ??
+          0
         }
         currency={refundFor?.currency ?? ""}
       />

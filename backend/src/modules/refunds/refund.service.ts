@@ -18,8 +18,8 @@ export class RefundService {
   ) {}
 
   requestRefund(
-    requestedByUserId: number,
-    paymentId: number,
+    requestedByUserId: string,
+    paymentId: string,
     amount: number | undefined,
     reason: string | undefined,
     idempotencyKey: string,
@@ -37,7 +37,7 @@ export class RefundService {
     return this.repository.findAll(query);
   }
 
-  async findOne(id: number): Promise<RefundView> {
+  async findOne(id: string): Promise<RefundView> {
     const refund = await this.repository.findById(id);
     if (!refund) {
       throw new AppException('Refund not found', {

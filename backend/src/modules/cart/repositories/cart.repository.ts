@@ -1,12 +1,12 @@
 import type { Cart } from '../interfaces/cart.interface';
 
 export interface CartRepository {
-  findByUserId(userId: number): Promise<Cart | null>;
+  findByUserId(userId: string): Promise<Cart | null>;
   setItemQuantity(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     quantity: number,
   ): Promise<Cart>;
-  removeItem(userId: number, productId: number): Promise<Cart>;
-  clear(userId: number): Promise<Cart | null>;
+  removeItem(userId: string, productId: string): Promise<Cart>;
+  clear(userId: string): Promise<Cart | null>;
 }

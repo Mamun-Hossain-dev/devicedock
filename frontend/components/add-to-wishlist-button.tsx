@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { apiFetch } from "@/lib/api";
 
-export function AddToWishlistButton({ productId }: { productId: number }) {
+export function AddToWishlistButton({ productId }: { productId: string }) {
   const { user, accessToken } = useAuth();
   const router = useRouter();
   const save = async () => {

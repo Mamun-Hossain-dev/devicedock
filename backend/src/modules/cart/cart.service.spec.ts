@@ -30,7 +30,7 @@ describe('CartService', () => {
     const repository = {
       findByUserId: jest.fn(() => Promise.resolve(cart)),
       setItemQuantity: jest.fn(
-        (userId: number, productId: number, quantity: number) => {
+        (userId: string, productId: string, quantity: number) => {
           cart = {
             id: 1,
             userId,

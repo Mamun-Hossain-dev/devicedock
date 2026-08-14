@@ -417,7 +417,7 @@ export function HomePage() {
 
 function AvailableCoupons() {
   const router = useRouter();
-  const [copiedCouponId, setCopiedCouponId] = useState<number | null>(null);
+  const [copiedCouponId, setCopiedCouponId] = useState<string | null>(null);
   const coupons = useQuery({
     queryKey: ["operations", "coupons", "available"],
     queryFn: () => apiFetch<PublicCoupon[]>("/operations/coupons/available"),

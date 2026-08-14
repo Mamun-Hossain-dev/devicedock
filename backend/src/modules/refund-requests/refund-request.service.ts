@@ -30,7 +30,7 @@ export class RefundRequestService {
   }
 
   findAllForUser(
-    userId: number,
+    userId: string,
     query: RefundRequestListQuery,
   ): Promise<RefundRequestListResult> {
     return this.repository.findAllForUser(userId, query);
@@ -42,21 +42,21 @@ export class RefundRequestService {
     return this.repository.findAllForAdmin(query);
   }
 
-  async findOne(userId: number, requestId: number): Promise<RefundRequestView> {
+  async findOne(userId: string, requestId: string): Promise<RefundRequestView> {
     const request = await this.repository.findOwnedById(userId, requestId);
     if (!request) throw this.requestNotFound();
     return request;
   }
 
-  async findOneForAdmin(requestId: number): Promise<RefundRequestView> {
+  async findOneForAdmin(requestId: string): Promise<RefundRequestView> {
     const request = await this.repository.findById(requestId);
     if (!request) throw this.requestNotFound();
     return request;
   }
 
   async request(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
     reason: string,
   ): Promise<RefundRequestView> {
     const eligible = await this.repository.findRefundableOrder(userId, orderId);
@@ -96,8 +96,8 @@ export class RefundRequestService {
   }
 
   async approve(
-    adminId: number,
-    requestId: number,
+    adminId: string,
+    requestId: string,
     note?: string,
     amount?: number,
   ): Promise<RefundRequestView> {
@@ -147,8 +147,8 @@ export class RefundRequestService {
   }
 
   async deny(
-    adminId: number,
-    requestId: number,
+    adminId: string,
+    requestId: string,
     note?: string,
   ): Promise<RefundRequestView> {
     const request = await this.repository.findById(requestId);

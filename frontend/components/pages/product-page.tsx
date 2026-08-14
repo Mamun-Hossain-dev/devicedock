@@ -30,7 +30,7 @@ export function ProductPage({ productId }: { productId: string }) {
   const product =
     productQuery.data ??
     (productQuery.isError
-      ? demoProducts.find((item) => item.id === Number(productId))
+      ? demoProducts.find((item) => item.id === productId)
       : undefined);
   const relatedQuery = useQuery(
     relatedProductsQueryOptions(product?.category, productId),

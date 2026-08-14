@@ -10,22 +10,22 @@ import type { AdminOrderQueryDto } from '../dto/admin-order-query.dto';
 
 export interface OrderRepository {
   findAllByUser(
-    userId: number,
+    userId: string,
     options: PaginationOptions,
   ): Promise<PaginatedResult<OrderView>>;
-  findById(userId: number, orderId: number): Promise<OrderView | null>;
+  findById(userId: string, orderId: string): Promise<OrderView | null>;
   findAll(options: AdminOrderQueryDto): Promise<PaginatedResult<OrderView>>;
-  findByIdForAdmin(orderId: number): Promise<OrderView | null>;
+  findByIdForAdmin(orderId: string): Promise<OrderView | null>;
   updateStatus(
-    orderId: number,
+    orderId: string,
     status: OrderView['status'],
   ): Promise<OrderView>;
-  deleteRemovable(orderId: number): Promise<boolean>;
+  deleteRemovable(orderId: string): Promise<boolean>;
   getInvoiceData(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
   ): Promise<PaymentSucceededEvent | null>;
   getInvoiceDataForAdmin(
-    orderId: number,
+    orderId: string,
   ): Promise<PaymentSucceededEvent | null>;
 }

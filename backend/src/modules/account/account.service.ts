@@ -16,56 +16,56 @@ export class AccountService {
     private readonly repository: AccountRepository,
   ) {}
 
-  listAddresses(userId: number) {
+  listAddresses(userId: string) {
     return this.repository.listAddresses(userId);
   }
-  createAddress(userId: number, input: SaveAddressDto) {
+  createAddress(userId: string, input: SaveAddressDto) {
     return this.repository.createAddress(userId, input);
   }
-  async updateAddress(userId: number, id: number, input: SaveAddressDto) {
+  async updateAddress(userId: string, id: string, input: SaveAddressDto) {
     const address = await this.repository.updateAddress(userId, id, input);
     if (!address) throw this.notFound('ADDRESS_NOT_FOUND', 'Address not found');
     return address;
   }
-  async deleteAddress(userId: number, id: number) {
+  async deleteAddress(userId: string, id: string) {
     if (!(await this.repository.deleteAddress(userId, id))) {
       throw this.notFound('ADDRESS_NOT_FOUND', 'Address not found');
     }
   }
-  listWishlist(userId: number) {
+  listWishlist(userId: string) {
     return this.repository.listWishlist(userId);
   }
-  async addWishlist(userId: number, productId: number) {
+  async addWishlist(userId: string, productId: string) {
     try {
       return await this.repository.addWishlist(userId, productId);
     } catch {
       throw this.notFound('PRODUCT_NOT_FOUND', 'Product not found');
     }
   }
-  async removeWishlist(userId: number, productId: number) {
+  async removeWishlist(userId: string, productId: string) {
     if (!(await this.repository.removeWishlist(userId, productId))) {
       throw this.notFound('WISHLIST_ITEM_NOT_FOUND', 'Wishlist item not found');
     }
   }
-  getNotificationPreferences(userId: number) {
+  getNotificationPreferences(userId: string) {
     return this.repository.getNotificationPreferences(userId);
   }
   updateNotificationPreferences(
-    userId: number,
+    userId: string,
     input: UpdateNotificationPreferencesDto,
   ) {
     return this.repository.updateNotificationPreferences(userId, input);
   }
-  listNotifications(userId: number) {
+  listNotifications(userId: string) {
     return this.repository.listNotifications(userId);
   }
-  async markNotificationRead(userId: number, id: number) {
+  async markNotificationRead(userId: string, id: string) {
     if (!(await this.repository.markNotificationRead(userId, id))) {
       throw this.notFound('NOTIFICATION_NOT_FOUND', 'Notification not found');
     }
   }
   createNotification(
-    userId: number,
+    userId: string,
     input: { type: string; title: string; message: string },
   ) {
     return this.repository.createNotification(userId, input);

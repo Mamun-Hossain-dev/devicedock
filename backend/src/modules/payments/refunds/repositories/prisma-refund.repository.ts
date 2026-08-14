@@ -39,7 +39,7 @@ export class PrismaRefundRepository implements RefundRepository {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  findById(id: number): Promise<RefundView | null> {
+  findById(id: string): Promise<RefundView | null> {
     return this.prisma.refund.findUnique({
       where: { id },
       include: refundInclude,
@@ -53,7 +53,7 @@ export class PrismaRefundRepository implements RefundRepository {
     });
   }
 
-  findAllByPaymentId(paymentId: number): Promise<RefundView[]> {
+  findAllByPaymentId(paymentId: string): Promise<RefundView[]> {
     return this.prisma.refund.findMany({
       where: { paymentId },
       orderBy: { createdAt: 'asc' },
@@ -205,7 +205,7 @@ export class PrismaRefundRepository implements RefundRepository {
 
   private async maybeMarkPaymentRefunded(
     prisma: Prisma.TransactionClient,
-    paymentId: number,
+    paymentId: string,
   ): Promise<void> {
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
@@ -233,7 +233,7 @@ export class PrismaRefundRepository implements RefundRepository {
 
   private async releaseCouponRedemption(
     prisma: Prisma.TransactionClient,
-    orderId: number,
+    orderId: string,
   ): Promise<void> {
     const redemption = await prisma.couponRedemption.findUnique({
       where: { orderId },

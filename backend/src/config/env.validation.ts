@@ -68,6 +68,7 @@ const envSchema = z
     SMTP_PASSWORD: z.string().optional(),
     MAIL_FROM: z.string().optional(),
     MAIL_ADMIN_TO: z.string().email().optional(),
+    MAIL_SITE_URL: z.string().url().optional(),
     STRIPE_ENABLED: booleanString,
     STRIPE_SECRET_KEY: z.string().optional(),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),

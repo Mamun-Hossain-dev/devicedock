@@ -215,7 +215,9 @@ Copy the endpoint's production `whsec_...` value into
 `backend/backend.env`. Use the same Google client ID in frontend and backend.
 
 For Gmail SMTP, enable Google 2-Step Verification and put a generated App
-Password—not the normal Gmail password—in `SMTP_PASSWORD`.
+Password—not the normal Gmail password—in `SMTP_PASSWORD`. Set `MAIL_SITE_URL`
+to `https://devicedock.duckdns.org` so email buttons and links point at the
+public storefront.
 
 ## 8. Configure Nginx over HTTP
 

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useDeferredValue, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Image from "next/image";
+import Link from "next/link";
+import { useDeferredValue, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Boxes,
   MoreHorizontal,
@@ -12,64 +12,64 @@ import {
   Search,
   Star,
   Trash2,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useAuth } from '@/components/auth-provider';
-import { AdminPageHeader } from '@/components/admin/admin-page-header';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/components/auth-provider";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { EmptyState } from '@/components/ui/empty-state';
-import { Input } from '@/components/ui/field';
-import { Pagination } from '@/components/ui/pagination';
-import { Select, type SelectOption } from '@/components/ui/select';
-import { apiFetch, money } from '@/lib/api';
-import type { Category, PaginatedProducts, Product } from '@/lib/types';
+} from "@/components/ui/dropdown-menu";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Input } from "@/components/ui/field";
+import { Pagination } from "@/components/ui/pagination";
+import { Select, type SelectOption } from "@/components/ui/select";
+import { apiFetch, money } from "@/lib/api";
+import type { Category, PaginatedProducts, Product } from "@/lib/types";
 
 const categoryOptions: SelectOption[] = [
-  { value: 'all', label: 'All products' },
-  { value: 'MOBILE', label: 'MOBILE' },
-  { value: 'LAPTOP', label: 'LAPTOP' },
-  { value: 'TABLET', label: 'TABLET' },
-  { value: 'AUDIO', label: 'AUDIO' },
-  { value: 'WATCH', label: 'WATCH' },
-  { value: 'ACCESSORY', label: 'ACCESSORY' },
+  { value: "all", label: "All products" },
+  { value: "MOBILE", label: "MOBILE" },
+  { value: "LAPTOP", label: "LAPTOP" },
+  { value: "TABLET", label: "TABLET" },
+  { value: "AUDIO", label: "AUDIO" },
+  { value: "WATCH", label: "WATCH" },
+  { value: "ACCESSORY", label: "ACCESSORY" },
 ];
 
 const sortOptions: SelectOption[] = [
-  { value: 'newest', label: 'Newest first' },
-  { value: 'name-asc', label: 'Name A–Z' },
-  { value: 'price-asc', label: 'Lowest price' },
-  { value: 'price-desc', label: 'Highest price' },
+  { value: "newest", label: "Newest first" },
+  { value: "name-asc", label: "Name A–Z" },
+  { value: "price-asc", label: "Lowest price" },
+  { value: "price-desc", label: "Highest price" },
 ];
 
 export function AdminProducts() {
   const { accessToken } = useAuth();
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
-  const [category, setCategory] = useState<Category | 'all'>('all');
-  const [sort, setSort] = useState('newest');
+  const [category, setCategory] = useState<Category | "all">("all");
+  const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
   const [deleting, setDeleting] = useState<Product | null>(null);
 
   const params = new URLSearchParams({
     page: String(page),
-    limit: '10',
+    limit: "10",
     sort,
   });
-  if (deferredSearch.trim()) params.set('search', deferredSearch.trim());
-  if (category !== 'all') params.set('category', category);
+  if (deferredSearch.trim()) params.set("search", deferredSearch.trim());
+  if (category !== "all") params.set("category", category);
 
   const query = useQuery({
-    queryKey: ['admin', 'products', params.toString()],
+    queryKey: ["admin", "products", params.toString()],
     queryFn: () =>
       apiFetch<PaginatedProducts>(
         `/products/admin/list?${params}`,
@@ -81,13 +81,13 @@ export function AdminProducts() {
   });
 
   const remove = useMutation({
-    mutationFn: (id: number) =>
-      apiFetch<null>(`/products/${id}`, { method: 'DELETE' }, accessToken),
+    mutationFn: (id: string) =>
+      apiFetch<null>(`/products/${id}`, { method: "DELETE" }, accessToken),
     onSuccess: async () => {
       setDeleting(null);
-      toast.success('Product deleted');
-      await queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success("Product deleted");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -131,7 +131,7 @@ export function AdminProducts() {
           <Select
             value={category}
             onValueChange={(value) => {
-              setCategory(value as Category | 'all');
+              setCategory(value as Category | "all");
               setPage(1);
             }}
             options={categoryOptions}
@@ -225,14 +225,14 @@ export function AdminProducts() {
                       <Badge
                         tone={
                           product.quantity === 0
-                            ? 'danger'
+                            ? "danger"
                             : product.quantity < 5
-                              ? 'warning'
-                              : 'success'
+                              ? "warning"
+                              : "success"
                         }
                       >
                         {product.quantity === 0
-                          ? 'Out of stock'
+                          ? "Out of stock"
                           : `${product.quantity} in stock`}
                       </Badge>
                     </td>
@@ -291,7 +291,7 @@ export function AdminProducts() {
         open={Boolean(deleting)}
         onOpenChange={(open) => !open && setDeleting(null)}
         title="Delete this product?"
-        description={`“${deleting?.title ?? 'This product'}” and its uploaded images will be permanently removed.`}
+        description={`“${deleting?.title ?? "This product"}” and its uploaded images will be permanently removed.`}
         confirmLabel="Delete product"
         danger
         loading={remove.isPending}

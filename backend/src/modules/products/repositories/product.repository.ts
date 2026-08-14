@@ -15,13 +15,13 @@ export interface ProductRepository {
   findAll(
     options: ProductListOptions,
   ): Promise<RepositoryPaginatedResult<Product>>;
-  findById(id: number): Promise<Product | null>;
+  findById(id: string): Promise<Product | null>;
   findCollections(limit: number): Promise<ProductCollections>;
   getOperationsSummary(): Promise<CatalogOperationsSummary>;
   adjustStock(
-    id: number,
+    id: string,
     quantity: number,
-    adjustedById: number,
+    adjustedById: string,
     reason: string,
   ): Promise<StockAdjustment | null>;
   create(
@@ -29,12 +29,12 @@ export interface ProductRepository {
     images?: NewProductImage[],
   ): Promise<Product>;
   update(
-    id: number,
+    id: string,
     input: UpdateProductInput,
     images?: NewProductImage[],
   ): Promise<Product | null>;
-  addImages(id: number, images: NewProductImage[]): Promise<Product | null>;
-  findImage(productId: number, imageId: number): Promise<ProductImage | null>;
-  deleteImage(productId: number, imageId: number): Promise<void>;
-  delete(id: number): Promise<void>;
+  addImages(id: string, images: NewProductImage[]): Promise<Product | null>;
+  findImage(productId: string, imageId: string): Promise<ProductImage | null>;
+  deleteImage(productId: string, imageId: string): Promise<void>;
+  delete(id: string): Promise<void>;
 }

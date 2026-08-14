@@ -62,9 +62,9 @@ enum CouponRedemptionStatus {
 }
 
 model Order {
-  id                  Int                   @id @default(autoincrement())
+  id                  String                @id @default(uuid(7)) @db.Uuid
   orderNumber         String                @unique
-  userId              Int
+  userId              String                @db.Uuid
   user                User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
   customerName        String
   customerEmail       String
@@ -73,7 +73,7 @@ model Order {
   deliveryArea        String
   deliveryCity        String
   deliveryPostalCode  String?
-  couponId            Int?
+  couponId            String?               @db.Uuid
   coupon              Coupon?               @relation(fields: [couponId], references: [id], onDelete: SetNull)
   couponCode          String?
   paymentMethod       CheckoutPaymentMethod @default(CARD)
@@ -99,7 +99,7 @@ model Order {
 }
 
 model Coupon {
-  id            Int                @id @default(autoincrement())
+  id            String             @id @default(uuid(7)) @db.Uuid
   code          String             @unique
   description   String?
   type          CouponType
@@ -121,12 +121,12 @@ model Coupon {
 }
 
 model CouponRedemption {
-  id        Int                    @id @default(autoincrement())
-  couponId  Int
+  id        String                 @id @default(uuid(7)) @db.Uuid
+  couponId  String                 @db.Uuid
   coupon    Coupon                 @relation(fields: [couponId], references: [id], onDelete: Restrict)
-  userId    Int
+  userId    String                 @db.Uuid
   user      User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
-  orderId   Int                    @unique
+  orderId   String                 @unique @db.Uuid
   order     Order                  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   status    CouponRedemptionStatus @default(RESERVED)
   createdAt DateTime               @default(now())
@@ -137,10 +137,10 @@ model CouponRedemption {
 }
 
 model OrderItem {
-  id           Int      @id @default(autoincrement())
-  orderId      Int
+  id           String   @id @default(uuid(7)) @db.Uuid
+  orderId      String   @db.Uuid
   order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId    Int?
+  productId    String?  @db.Uuid
   product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   productTitle String
   productSku   String
@@ -155,8 +155,8 @@ model OrderItem {
 }
 
 model Payment {
-  id               Int             @id @default(autoincrement())
-  orderId          Int
+  id               String          @id @default(uuid(7)) @db.Uuid
+  orderId          String          @db.Uuid
   order            Order           @relation(fields: [orderId], references: [id], onDelete: Restrict)
   provider         PaymentProvider @default(STRIPE)
   status           PaymentStatus   @default(PENDING)
@@ -178,8 +178,8 @@ model Payment {
 }
 
 model Refund {
-  id               Int             @id @default(autoincrement())
-  paymentId        Int
+  id               String          @id @default(uuid(7)) @db.Uuid
+  paymentId        String          @db.Uuid
   payment          Payment         @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   provider         PaymentProvider @default(STRIPE)
   providerRefundId String?         @unique
@@ -189,7 +189,7 @@ model Refund {
   status           RefundStatus    @default(PENDING)
   failureCode      String?
   failureMessage   String?
-  requestedById    Int?
+  requestedById    String?         @db.Uuid
   requestedBy      User?           @relation(fields: [requestedById], references: [id], onDelete: SetNull)
   idempotencyKey   String          @unique
   refundRequest    RefundRequest?
@@ -203,16 +203,16 @@ model Refund {
 }
 
 model RefundRequest {
-  id           Int                 @id @default(autoincrement())
-  orderId      Int
+  id           String              @id @default(uuid(7)) @db.Uuid
+  orderId      String              @db.Uuid
   order        Order               @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  userId       Int
+  userId       String              @db.Uuid
   user         User                @relation(fields: [userId], references: [id], onDelete: Restrict)
   reason       String
   status       RefundRequestStatus @default(PENDING)
-  refundId     Int?                    @unique
-  refund       Refund?                 @relation(fields: [refundId], references: [id], onDelete: SetNull)
-  adminId      Int?
+  refundId     String?             @unique @db.Uuid
+  refund       Refund?             @relation(fields: [refundId], references: [id], onDelete: SetNull)
+  adminId      String?             @db.Uuid
   admin        User?               @relation("RefundRequestReviewer", fields: [adminId], references: [id], onDelete: SetNull)
   decisionNote String?
   reviewedAt   DateTime?
@@ -226,7 +226,7 @@ model RefundRequest {
 }
 
 model PaymentWebhookEvent {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid(7)) @db.Uuid
   provider    String
   eventId     String   @unique
   eventType   String
@@ -238,7 +238,7 @@ model PaymentWebhookEvent {
 }
 
 model ProcessedConsumerEvent {
-  id          Int                 @id @default(autoincrement())
+  id          String              @id @default(uuid(7)) @db.Uuid
   consumer    String
   eventId     String
   status      ConsumerEventStatus @default(PROCESSING)

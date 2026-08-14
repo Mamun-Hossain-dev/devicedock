@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -53,7 +53,7 @@ export class OperationsController {
   @ResponseMessage('Stock adjusted successfully')
   adjustStock(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AdjustStockDto,
   ) {
     return this.service.adjustStock(id, dto.quantity, user.id, dto.reason);
@@ -63,7 +63,7 @@ export class OperationsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.SELLER)
   getProductMovements(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Query() query: PaginationQueryDto,
   ) {
     return this.service.getProductMovements(id, query);
@@ -78,7 +78,7 @@ export class OperationsController {
 
   @Public()
   @Get('reviews/products/:productId')
-  getProductReviews(@Param('productId', ParseIntPipe) productId: number) {
+  getProductReviews(@Param('productId', ParseUUIDPipe) productId: string) {
     return this.service.getProductReviews(productId);
   }
 
@@ -86,7 +86,7 @@ export class OperationsController {
   @ResponseMessage('Review submitted for moderation')
   createReview(
     @CurrentUser() user: PublicUser,
-    @Param('productId', ParseIntPipe) productId: number,
+    @Param('productId', ParseUUIDPipe) productId: string,
     @Body() dto: CreateReviewDto,
   ) {
     return this.service.createReview(user.id, productId, dto);
@@ -104,7 +104,7 @@ export class OperationsController {
   @Roles(Role.ADMIN)
   @ResponseMessage('Review moderated successfully')
   moderateReview(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: ModerateReviewDto,
   ) {
     return this.service.moderateReview(id, dto.status);
@@ -136,7 +136,7 @@ export class OperationsController {
   @Roles(Role.ADMIN)
   @ResponseMessage('Coupon updated successfully')
   updateCoupon(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCouponDto,
   ) {
     return this.service.updateCoupon(id, dto);
@@ -146,7 +146,7 @@ export class OperationsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Coupon deleted successfully')
-  async deleteCoupon(@Param('id', ParseIntPipe) id: number) {
+  async deleteCoupon(@Param('id', ParseUUIDPipe) id: string) {
     await this.service.deleteCoupon(id);
     return null;
   }

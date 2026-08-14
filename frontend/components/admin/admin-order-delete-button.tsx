@@ -21,7 +21,7 @@ export function AdminOrderDeleteButton({
   compact = false,
   redirectAfterDelete = false,
 }: {
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   compact?: boolean;
   redirectAfterDelete?: boolean;
