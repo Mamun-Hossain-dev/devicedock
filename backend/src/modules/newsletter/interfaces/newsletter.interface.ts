@@ -26,7 +26,7 @@ export type DeliveryStatus =
   (typeof DeliveryStatus)[keyof typeof DeliveryStatus];
 
 export interface NewsletterSubscriber {
-  id: number;
+  id: string;
   email: string;
   name: string | null;
   status: SubscriberStatus;
@@ -37,8 +37,8 @@ export interface NewsletterSubscriber {
 }
 
 export interface NewsletterDelivery {
-  id: number;
-  broadcastId: number;
+  id: string;
+  broadcastId: string;
   email: string;
   status: DeliveryStatus;
   error: string | null;
@@ -46,7 +46,7 @@ export interface NewsletterDelivery {
 }
 
 export interface NewsletterBroadcast {
-  id: number;
+  id: string;
   subject: string;
   previewText: string | null;
   content: string;

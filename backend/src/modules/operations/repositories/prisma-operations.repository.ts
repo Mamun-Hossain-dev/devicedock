@@ -65,7 +65,7 @@ export class PrismaOperationsRepository implements OperationsRepository {
         take: query.limit,
         orderBy: [{ quantity: 'asc' }, { title: 'asc' }],
         include: {
-          images: { orderBy: { id: 'asc' }, take: 1 },
+          images: { orderBy: { createdAt: 'asc' }, take: 1 },
           stockMovements: {
             orderBy: { createdAt: 'desc' },
             take: 1,
@@ -86,7 +86,7 @@ export class PrismaOperationsRepository implements OperationsRepository {
     };
   }
 
-  async getProductMovements(productId: number, query: PaginationQueryDto) {
+  async getProductMovements(productId: string, query: PaginationQueryDto) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { id: true },
@@ -262,8 +262,8 @@ export class PrismaOperationsRepository implements OperationsRepository {
   }
 
   async createReview(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     input: CreateReviewDto,
   ) {
     const [product, purchased] = await Promise.all([
@@ -311,7 +311,7 @@ export class PrismaOperationsRepository implements OperationsRepository {
     }
   }
 
-  getProductReviews(productId: number) {
+  getProductReviews(productId: string) {
     return this.prisma.review.findMany({
       where: { productId, status: 'APPROVED' },
       orderBy: { createdAt: 'desc' },
@@ -345,7 +345,7 @@ export class PrismaOperationsRepository implements OperationsRepository {
     };
   }
 
-  async moderateReview(id: number, status: 'APPROVED' | 'REJECTED') {
+  async moderateReview(id: string, status: 'APPROVED' | 'REJECTED') {
     const result = await this.prisma.review.updateMany({
       where: { id },
       data: { status },
@@ -403,7 +403,7 @@ export class PrismaOperationsRepository implements OperationsRepository {
       .catch((error: unknown) => this.rethrowCouponConflict(error));
   }
 
-  async updateCoupon(id: number, input: UpdateCouponDto) {
+  async updateCoupon(id: string, input: UpdateCouponDto) {
     const existing = await this.prisma.coupon.findUnique({ where: { id } });
     if (!existing) throw this.notFound('Coupon');
     if (
@@ -423,7 +423,7 @@ export class PrismaOperationsRepository implements OperationsRepository {
       .catch((error: unknown) => this.rethrowCouponConflict(error));
   }
 
-  async deleteCoupon(id: number) {
+  async deleteCoupon(id: string) {
     const result = await this.prisma.coupon.deleteMany({
       where: { id, redemptions: { none: {} } },
     });

@@ -12,7 +12,7 @@ import { toRepositoryPagination } from '../../../common/utils/pagination.util';
 import { getDueOnDelivery } from '../../payments/utils/checkout-amount.util';
 
 const orderInclude = {
-  items: { orderBy: { id: 'asc' as const } },
+  items: { orderBy: { createdAt: 'asc' as const } },
   payments: {
     orderBy: { createdAt: 'desc' as const },
     take: 1,
@@ -43,7 +43,7 @@ const adminOrderInclude = {
 export class PrismaOrderRepository implements OrderRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAllByUser(userId: number, options: PaginationOptions) {
+  async findAllByUser(userId: string, options: PaginationOptions) {
     const pagination = toRepositoryPagination(options);
     const [data, totalItems] = await this.prisma.$transaction([
       this.prisma.order.findMany({
@@ -67,7 +67,7 @@ export class PrismaOrderRepository implements OrderRepository {
     };
   }
 
-  findById(userId: number, orderId: number): Promise<OrderView | null> {
+  findById(userId: string, orderId: string): Promise<OrderView | null> {
     return this.prisma.order.findFirst({
       where: { id: orderId, userId },
       include: orderInclude,
@@ -116,7 +116,7 @@ export class PrismaOrderRepository implements OrderRepository {
     return Object.keys(where).length > 0 ? where : undefined;
   }
 
-  findByIdForAdmin(orderId: number): Promise<OrderView | null> {
+  findByIdForAdmin(orderId: string): Promise<OrderView | null> {
     return this.prisma.order.findUnique({
       where: { id: orderId },
       include: adminOrderInclude,
@@ -124,7 +124,7 @@ export class PrismaOrderRepository implements OrderRepository {
   }
 
   async updateStatus(
-    orderId: number,
+    orderId: string,
     status: OrderView['status'],
   ): Promise<OrderView> {
     return this.prisma.$transaction(async (prisma) => {
@@ -145,7 +145,7 @@ export class PrismaOrderRepository implements OrderRepository {
     });
   }
 
-  async deleteRemovable(orderId: number): Promise<boolean> {
+  async deleteRemovable(orderId: string): Promise<boolean> {
     return this.prisma.$transaction(async (prisma) => {
       const order = await prisma.order.findUnique({
         where: { id: orderId },
@@ -179,21 +179,21 @@ export class PrismaOrderRepository implements OrderRepository {
   }
 
   async getInvoiceData(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
   ): Promise<PaymentSucceededEvent | null> {
     return this.findInvoiceData({ id: orderId, userId });
   }
 
   async getInvoiceDataForAdmin(
-    orderId: number,
+    orderId: string,
   ): Promise<PaymentSucceededEvent | null> {
     return this.findInvoiceData({ id: orderId });
   }
 
   private async findInvoiceData(where: {
-    id: number;
-    userId?: number;
+    id: string;
+    userId?: string;
   }): Promise<PaymentSucceededEvent | null> {
     const order = await this.prisma.order.findFirst({
       where: {
@@ -203,7 +203,7 @@ export class PrismaOrderRepository implements OrderRepository {
         },
       },
       include: {
-        items: { orderBy: { id: 'asc' } },
+        items: { orderBy: { createdAt: 'asc' } },
         payments: {
           where: { status: 'SUCCEEDED' },
           orderBy: { paidAt: 'desc' },

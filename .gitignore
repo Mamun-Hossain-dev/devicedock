@@ -1,6 +1,6 @@
 # Environment
-.env
-.env.local
 .env.*.local
 backend/backend.env
 frontend/frontend.env
+config.bat
+node_modules

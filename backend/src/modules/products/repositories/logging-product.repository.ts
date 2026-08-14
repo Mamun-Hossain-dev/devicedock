@@ -21,7 +21,7 @@ export class LoggingProductRepository implements ProductRepository {
     return await this.repository.findAll(options);
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     this.logger.log(`Fetching product ${id}`);
     return await this.repository.findById(id);
   }
@@ -36,9 +36,9 @@ export class LoggingProductRepository implements ProductRepository {
   }
 
   adjustStock(
-    id: number,
+    id: string,
     quantity: number,
-    adjustedById: number,
+    adjustedById: string,
     reason: string,
   ) {
     this.logger.log(`Adjusting stock for product ${id}`);
@@ -51,7 +51,7 @@ export class LoggingProductRepository implements ProductRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     input: UpdateProductInput,
     images: NewProductImage[] = [],
   ) {
@@ -59,21 +59,21 @@ export class LoggingProductRepository implements ProductRepository {
     return await this.repository.update(id, input, images);
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     this.logger.log(`Deleting product ${id}`);
     return await this.repository.delete(id);
   }
 
-  async addImages(id: number, images: NewProductImage[]) {
+  async addImages(id: string, images: NewProductImage[]) {
     this.logger.log(`Adding ${images.length} images to product ${id}`);
     return this.repository.addImages(id, images);
   }
 
-  async findImage(productId: number, imageId: number) {
+  async findImage(productId: string, imageId: string) {
     return this.repository.findImage(productId, imageId);
   }
 
-  async deleteImage(productId: number, imageId: number) {
+  async deleteImage(productId: string, imageId: string) {
     this.logger.log(`Deleting image ${imageId} from product ${productId}`);
     return this.repository.deleteImage(productId, imageId);
   }

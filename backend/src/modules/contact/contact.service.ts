@@ -45,7 +45,7 @@ export class ContactService {
   }
 
   async updateStatus(
-    id: number,
+    id: string,
     status: ContactStatus,
   ): Promise<ContactMessage> {
     const message = await this.repository.updateStatus(id, status);

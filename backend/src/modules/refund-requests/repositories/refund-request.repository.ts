@@ -7,36 +7,36 @@ import type {
 
 export interface RefundRequestRepository {
   create(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
     reason: string,
   ): Promise<RefundRequestView>;
-  findById(requestId: number): Promise<RefundRequestView | null>;
+  findById(requestId: string): Promise<RefundRequestView | null>;
   findOwnedById(
-    userId: number,
-    requestId: number,
+    userId: string,
+    requestId: string,
   ): Promise<RefundRequestView | null>;
-  findActiveForOrder(orderId: number): Promise<RefundRequestView | null>;
+  findActiveForOrder(orderId: string): Promise<RefundRequestView | null>;
   findRefundableOrder(
-    userId: number,
-    orderId: number,
+    userId: string,
+    orderId: string,
   ): Promise<RefundableOrder | null>;
   findAllForUser(
-    userId: number,
+    userId: string,
     query: RefundRequestListQuery,
   ): Promise<PaginatedResult<RefundRequestView>>;
   findAllForAdmin(
     query: RefundRequestListQuery,
   ): Promise<PaginatedResult<RefundRequestView>>;
   approve(
-    requestId: number,
-    adminId: number,
-    refundId: number,
+    requestId: string,
+    adminId: string,
+    refundId: string,
     note: string | null,
   ): Promise<RefundRequestView | null>;
   deny(
-    requestId: number,
-    adminId: number,
+    requestId: string,
+    adminId: string,
     note: string | null,
   ): Promise<RefundRequestView | null>;
 }

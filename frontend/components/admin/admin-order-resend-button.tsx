@@ -14,7 +14,7 @@ export function AdminOrderResendButton({
   orderNumber,
   compact = false,
 }: {
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   compact?: boolean;
 }) {
@@ -24,7 +24,7 @@ export function AdminOrderResendButton({
 
   const resend = useMutation({
     mutationFn: () =>
-      apiFetch<{ orderId: number; eventId: string }>(
+      apiFetch<{ orderId: string; eventId: string }>(
         `/orders/admin/${orderId}/resend-confirmation`,
         { method: "POST" },
         accessToken,

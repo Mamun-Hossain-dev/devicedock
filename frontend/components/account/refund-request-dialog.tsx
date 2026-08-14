@@ -22,7 +22,7 @@ export function RefundRequestDialog({
 }: {
   open: boolean;
   onOpenChange(open: boolean): void;
-  orderId: number;
+  orderId: string;
   orderNumber: string;
   amount: number;
   currency: string;

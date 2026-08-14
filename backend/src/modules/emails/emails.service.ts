@@ -3,6 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import type { Transporter } from 'nodemailer';
 import { EMAIL_TRANSPORTER } from './constants/email.tokens';
 import { buildWelcomeEmail } from './templates/welcome-email.template';
+import { buildNewsletterEmail } from './templates/newsletter-email.template';
+import { buildPaymentConfirmationEmail } from './templates/payment-confirmation-email.template';
+import { buildNewOrderAdminEmail } from './templates/new-order-admin-email.template';
+import { buildRefundConfirmationEmail } from './templates/refund-confirmation-email.template';
 import type { PaymentSucceededEvent } from '../payments/interfaces/payment.interface';
 import type { RefundCompletedEvent } from '../payments/refunds/interfaces/refund.interface';
 
@@ -22,7 +26,7 @@ export class EmailsService {
       return;
     }
 
-    const template = buildWelcomeEmail(name);
+    const template = buildWelcomeEmail(name, this.siteUrl());
 
     await this.transporter.sendMail({
       from: this.configService.getOrThrow<string>('email.from'),
@@ -42,21 +46,17 @@ export class EmailsService {
       return;
     }
 
-    const escapeHtml = (value: string) =>
-      value
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    const htmlContent = escapeHtml(content).replaceAll('\n', '<br />');
+    const template = buildNewsletterEmail(
+      subject,
+      previewText,
+      content,
+      this.siteUrl(),
+    );
 
     await this.transporter.sendMail({
       from: this.configService.getOrThrow<string>('email.from'),
       to,
-      subject,
-      text: `${previewText ? `${previewText}\n\n` : ''}${content}`,
-      html: `<main style="font-family:Arial,sans-serif;max-width:640px;margin:auto;padding:32px"><p style="color:#b4472f;font-weight:700">DeviceDock</p>${previewText ? `<p style="color:#666">${escapeHtml(previewText)}</p>` : ''}<div style="line-height:1.7">${htmlContent}</div></main>`,
+      ...template,
     });
   }
 
@@ -71,39 +71,16 @@ export class EmailsService {
       return;
     }
 
-    const amount = new Intl.NumberFormat('en-BD', {
-      style: 'currency',
-      currency: event.currency.toUpperCase(),
-    }).format(event.totalAmount / 100);
-    const dueOnDelivery = new Intl.NumberFormat('en-BD', {
-      style: 'currency',
-      currency: event.currency.toUpperCase(),
-    }).format(event.dueOnDelivery / 100);
-    const confirmation =
-      event.paymentMethod === 'CASH_ON_DELIVERY'
-        ? `Your card deposit for order ${event.orderNumber} is paid. ${dueOnDelivery} is due in cash on delivery.`
-        : `Your payment for order ${event.orderNumber} is confirmed.`;
+    const template = buildPaymentConfirmationEmail(
+      event,
+      invoice,
+      this.siteUrl(),
+    );
+
     await this.transporter.sendMail({
       from: this.configService.getOrThrow<string>('email.from'),
       to: event.customer.email,
-      subject: `Order ${event.orderNumber} payment confirmed`,
-      text: [
-        `Hello ${event.customer.name},`,
-        '',
-        confirmation,
-        `Payment ID: ${event.paymentId}`,
-        `Total: ${amount}`,
-        '',
-        'Your PDF invoice is attached.',
-      ].join('\n'),
-      html: `<main style="font-family:Arial,sans-serif;max-width:640px;margin:auto;padding:32px"><p style="color:#b4472f;font-weight:700">DeviceDock</p><h1>Payment confirmed</h1><p>Hello ${this.escapeHtml(event.customer.name)},</p><p>${this.escapeHtml(confirmation)}</p><p>Payment ID: ${event.paymentId}<br />Paid now: ${this.escapeHtml(amount)}</p><p>Your PDF invoice is attached.</p></main>`,
-      attachments: [
-        {
-          filename: `devicedock-${event.orderNumber}.pdf`,
-          content: invoice,
-          contentType: 'application/pdf',
-        },
-      ],
+      ...template,
     });
   }
 
@@ -113,55 +90,12 @@ export class EmailsService {
   ): Promise<void> {
     if (!this.configService.get<boolean>('email.enabled', false)) return;
 
-    const orderTotal = this.money(event.orderTotal, event.currency);
-    const paidNow = this.money(event.totalAmount, event.currency);
-    const address = [
-      event.customer.addressLine,
-      event.customer.area,
-      event.customer.city,
-      event.customer.postalCode,
-    ]
-      .filter(Boolean)
-      .join(', ');
-    const items = event.items
-      .map(
-        (item) =>
-          `${item.productTitle} (${item.productSku}) × ${item.quantity} — ${this.money(item.totalAmount, event.currency)}`,
-      )
-      .join('\n');
-    const htmlItems = event.items
-      .map(
-        (item) =>
-          `<li>${this.escapeHtml(item.productTitle)} (${this.escapeHtml(item.productSku)}) × ${item.quantity} — ${this.escapeHtml(this.money(item.totalAmount, event.currency))}</li>`,
-      )
-      .join('');
+    const template = buildNewOrderAdminEmail(event, invoice, this.siteUrl());
 
     await this.transporter.sendMail({
       from: this.configService.getOrThrow<string>('email.from'),
       to: this.configService.getOrThrow<string>('email.adminTo'),
-      subject: `New confirmed order ${event.orderNumber}`,
-      text: [
-        `Order: ${event.orderNumber}`,
-        `Customer: ${event.customer.name}`,
-        `Email: ${event.customer.email}`,
-        `Phone: ${event.customer.phone}`,
-        `Address: ${address}`,
-        `Delivery zone: ${event.deliveryZone}`,
-        `Payment: ${event.paymentMethod}`,
-        '',
-        items,
-        '',
-        `Order total: ${orderTotal}`,
-        `Paid now: ${paidNow}`,
-      ].join('\n'),
-      html: `<main style="font-family:Arial,sans-serif;max-width:680px;margin:auto;padding:32px"><p style="color:#b4472f;font-weight:700">DeviceDock</p><h1>New confirmed order</h1><p><strong>${this.escapeHtml(event.orderNumber)}</strong></p><h2>Customer and delivery</h2><p>${this.escapeHtml(event.customer.name)}<br />${this.escapeHtml(event.customer.email)}<br />${this.escapeHtml(event.customer.phone)}<br />${this.escapeHtml(address)}</p><h2>Products</h2><ul>${htmlItems}</ul><p><strong>Order total: ${this.escapeHtml(orderTotal)}</strong><br />Paid now: ${this.escapeHtml(paidNow)}</p></main>`,
-      attachments: [
-        {
-          filename: `devicedock-${event.orderNumber}.pdf`,
-          content: invoice,
-          contentType: 'application/pdf',
-        },
-      ],
+      ...template,
     });
   }
 
@@ -173,36 +107,18 @@ export class EmailsService {
       return;
     }
 
-    const amount = this.money(event.amount, event.currency);
+    const template = buildRefundConfirmationEmail(event, this.siteUrl());
+
     await this.transporter.sendMail({
       from: this.configService.getOrThrow<string>('email.from'),
       to: event.customer.email,
-      subject: `Refund issued for order ${event.orderNumber}`,
-      text: [
-        `Hello ${event.customer.name},`,
-        '',
-        `A refund of ${amount} for order ${event.orderNumber} has been issued.`,
-        'The amount will be returned to your original payment method within a few business days.',
-        ...(event.reason ? [`Reason: ${event.reason}`] : []),
-        `Refund ID: ${event.refundId}`,
-      ].join('\n'),
-      html: `<main style="font-family:Arial,sans-serif;max-width:640px;margin:auto;padding:32px"><p style="color:#b4472f;font-weight:700">DeviceDock</p><h1>Refund issued</h1><p>Hello ${this.escapeHtml(event.customer.name)},</p><p>A refund of <strong>${this.escapeHtml(amount)}</strong> for order <strong>${this.escapeHtml(event.orderNumber)}</strong> has been issued.</p><p>The amount will be returned to your original payment method within a few business days.</p>${event.reason ? `<p>Reason: ${this.escapeHtml(event.reason)}</p>` : ''}<p>Refund ID: ${event.refundId}</p></main>`,
+      ...template,
     });
   }
 
-  private money(amount: number, currency: string): string {
-    return new Intl.NumberFormat('en-BD', {
-      style: 'currency',
-      currency: currency.toUpperCase(),
-    }).format(amount / 100);
-  }
-
-  private escapeHtml(value: string): string {
-    return value
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
+  private siteUrl(): string {
+    return (
+      this.configService.get<string>('email.siteUrl') ?? 'http://localhost:3000'
+    );
   }
 }

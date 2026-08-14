@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -44,7 +44,7 @@ export class UserController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('User fetched successfully')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.getUserById(id);
   }
 
@@ -112,7 +112,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor('image'))
   @ResponseMessage('User updated successfully')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateUserDto,
     @UploadedFile(ImageFileValidationPipe) image?: Express.Multer.File,
   ) {
@@ -127,7 +127,7 @@ export class UserController {
   @Roles(Role.ADMIN)
   @Patch(':id/block')
   @ResponseMessage('User blocked successfully')
-  block(@Param('id', ParseIntPipe) id: number) {
+  block(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.setUserBlocked(id, true);
   }
 
@@ -135,7 +135,7 @@ export class UserController {
   @Roles(Role.ADMIN)
   @Patch(':id/unblock')
   @ResponseMessage('User unblocked successfully')
-  unblock(@Param('id', ParseIntPipe) id: number) {
+  unblock(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.setUserBlocked(id, false);
   }
 
@@ -143,7 +143,7 @@ export class UserController {
   @Roles(Role.ADMIN)
   @Delete(':id')
   @ResponseMessage('User deleted successfully')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.userService.deleteUser(id);
 
     return null;

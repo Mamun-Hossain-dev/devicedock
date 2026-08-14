@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -56,14 +56,14 @@ export class ProductsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.SELLER)
   @ResponseMessage('Admin product fetched successfully')
-  findOneForAdmin(@Param('id', ParseIntPipe) id: number) {
+  findOneForAdmin(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.getProductById(id);
   }
 
   @Public()
   @Get(':id')
   @ResponseMessage('Product fetched successfully')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.getPublicProductById(id);
   }
 
@@ -84,8 +84,8 @@ export class ProductsController {
   @Roles(Role.ADMIN, Role.SELLER)
   @ResponseMessage('Product image removed successfully')
   removeImage(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('imageId', ParseIntPipe) imageId: number,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('imageId', ParseUUIDPipe) imageId: string,
   ) {
     return this.productsService.removeImage(id, imageId);
   }
@@ -96,7 +96,7 @@ export class ProductsController {
   @UseInterceptors(FilesInterceptor('images'))
   @ResponseMessage('Product updated successfully')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateProductDto,
     @UploadedFiles(ImageFilesValidationPipe) images: Express.Multer.File[],
   ) {
@@ -111,7 +111,7 @@ export class ProductsController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.SELLER)
   @ResponseMessage('Product deleted successfully')
-  async delete(@Param('id', ParseIntPipe) id: number) {
+  async delete(@Param('id', ParseUUIDPipe) id: string) {
     await this.productsService.deleteProduct(id);
 
     return null;

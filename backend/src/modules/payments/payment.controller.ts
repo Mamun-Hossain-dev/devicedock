@@ -4,7 +4,7 @@ import {
   Get,
   Headers,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   Req,
 } from '@nestjs/common';
@@ -59,7 +59,7 @@ export class PaymentController {
   @ResponseMessage('Payment fetched successfully')
   findOne(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.paymentService.getPayment(user.id, id);
   }
@@ -68,7 +68,7 @@ export class PaymentController {
   @ResponseMessage('Payment session fetched successfully')
   getSession(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.paymentService.getCheckoutSession(user.id, id);
   }

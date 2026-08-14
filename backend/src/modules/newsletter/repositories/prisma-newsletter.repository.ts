@@ -90,7 +90,7 @@ export class PrismaNewsletterRepository implements NewsletterRepository {
   }
 
   async updateDelivery(
-    id: number,
+    id: string,
     status: DeliveryStatus,
     error?: string,
   ): Promise<void> {
@@ -104,7 +104,7 @@ export class PrismaNewsletterRepository implements NewsletterRepository {
     });
   }
 
-  async completeBroadcast(id: number): Promise<NewsletterBroadcast> {
+  async completeBroadcast(id: string): Promise<NewsletterBroadcast> {
     const [sentCount, failedCount] = await Promise.all([
       this.prisma.newsletterDelivery.count({
         where: { broadcastId: id, status: DeliveryStatuses.SENT },

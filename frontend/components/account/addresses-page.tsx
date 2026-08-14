@@ -18,7 +18,7 @@ type AddressValues = Omit<Address, "id">;
 export function AddressesPage() {
   const { accessToken, user } = useAuth();
   const queryClient = useQueryClient();
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const addresses = useQuery({
     queryKey: ["account", "addresses"],
     queryFn: () => apiFetch<Address[]>("/account/addresses", {}, accessToken),
@@ -43,7 +43,7 @@ export function AddressesPage() {
       id,
     }: {
       values: AddressValues;
-      id: number | null;
+      id: string | null;
     }) =>
       apiFetch<Address>(
         id ? `/account/addresses/${id}` : "/account/addresses",
@@ -61,7 +61,7 @@ export function AddressesPage() {
     onError: (error: Error) => toast.error(error.message),
   });
   const remove = useMutation({
-    mutationFn: (id: number) =>
+    mutationFn: (id: string) =>
       apiFetch<null>(
         `/account/addresses/${id}`,
         { method: "DELETE" },

@@ -18,19 +18,19 @@ export interface UserRepository {
   findAll(options: UserListOptions): Promise<RepositoryPaginatedResult<User>>;
   findByEmail(email: string): Promise<User | null>;
   findByGoogleId(googleId: string): Promise<User | null>;
-  findById(id: number): Promise<User | null>;
+  findById(id: string): Promise<User | null>;
   create(user: CreateUserInput, image?: UserProfileImage): Promise<User>;
   update(
-    id: number,
+    id: string,
     user: UpdateUserInput,
     image?: UserProfileImage,
   ): Promise<User | null>;
-  setBlocked(id: number, isBlocked: boolean): Promise<User | null>;
-  linkGoogleAccount(id: number, googleId: string): Promise<User | null>;
+  setBlocked(id: string, isBlocked: boolean): Promise<User | null>;
+  linkGoogleAccount(id: string, googleId: string): Promise<User | null>;
   updateProfileImage(
-    id: number,
+    id: string,
     image: UserProfileImage | null,
   ): Promise<User | null>;
-  updatePassword(id: number, password: string): Promise<User | null>;
-  delete(id: number): Promise<void>;
+  updatePassword(id: string, password: string): Promise<User | null>;
+  delete(id: string): Promise<void>;
 }

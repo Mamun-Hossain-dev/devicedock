@@ -1,30 +1,30 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ImagePlus, Save, Star, Trash2, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { useAuth } from '@/components/auth-provider';
-import { AdminPageHeader } from '@/components/admin/admin-page-header';
-import { Button } from '@/components/ui/button';
-import { Field, Input } from '@/components/ui/field';
-import { Select, type SelectOption } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { apiFetch } from '@/lib/api';
-import type { Category, Product } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, ImagePlus, Save, Star, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useAuth } from "@/components/auth-provider";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { Button } from "@/components/ui/button";
+import { Field, Input } from "@/components/ui/field";
+import { Select, type SelectOption } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { apiFetch } from "@/lib/api";
+import type { Category, Product } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const categories: Category[] = [
-  'MOBILE',
-  'LAPTOP',
-  'TABLET',
-  'AUDIO',
-  'WATCH',
-  'ACCESSORY',
+  "MOBILE",
+  "LAPTOP",
+  "TABLET",
+  "AUDIO",
+  "WATCH",
+  "ACCESSORY",
 ];
 
 const categoryOptions: SelectOption[] = categories.map((category) => ({
@@ -33,9 +33,9 @@ const categoryOptions: SelectOption[] = categories.map((category) => ({
 }));
 
 const statusOptions: SelectOption[] = [
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'DRAFT', label: 'Draft' },
-  { value: 'ARCHIVED', label: 'Archived' },
+  { value: "ACTIVE", label: "Active" },
+  { value: "DRAFT", label: "Draft" },
+  { value: "ARCHIVED", label: "Archived" },
 ];
 
 const MAX_PRODUCT_IMAGES = 4;
@@ -51,7 +51,7 @@ interface Values {
   price: number;
   compareAtPrice?: number;
   quantity: number;
-  status: Product['status'];
+  status: Product["status"];
   isFeatured: boolean;
   isTrending: boolean;
   isBestSeller: boolean;
@@ -90,17 +90,17 @@ export function ProductForm({ product }: { product?: Product }) {
     formState: { errors, isSubmitting },
   } = useForm<Values>({
     defaultValues: {
-      title: product?.title ?? '',
-      slug: product?.slug ?? '',
-      sku: product?.sku ?? '',
-      shortDescription: product?.shortDescription ?? '',
-      description: product?.description ?? '',
-      brand: product?.brand ?? '',
-      category: product?.category ?? 'MOBILE',
+      title: product?.title ?? "",
+      slug: product?.slug ?? "",
+      sku: product?.sku ?? "",
+      shortDescription: product?.shortDescription ?? "",
+      description: product?.description ?? "",
+      brand: product?.brand ?? "",
+      category: product?.category ?? "MOBILE",
       price: product?.price,
       compareAtPrice: product?.compareAtPrice ?? undefined,
       quantity: product?.quantity ?? 0,
-      status: product?.status ?? 'ACTIVE',
+      status: product?.status ?? "ACTIVE",
       isFeatured: product?.isFeatured ?? false,
       isTrending: product?.isTrending ?? false,
       isBestSeller: product?.isBestSeller ?? false,
@@ -116,80 +116,80 @@ export function ProductForm({ product }: { product?: Product }) {
   const save = handleSubmit(async (values) => {
     let specifications: Record<string, string>;
     try {
-      const parsed: unknown = JSON.parse(values.specifications || '{}');
-      if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') {
+      const parsed: unknown = JSON.parse(values.specifications || "{}");
+      if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") {
         throw new Error();
       }
       specifications = parsed as Record<string, string>;
     } catch {
-      setError('specifications', { message: 'Enter a valid JSON object.' });
+      setError("specifications", { message: "Enter a valid JSON object." });
       return;
     }
 
     const data = new FormData();
-    data.set('title', values.title.trim());
-    if (values.slug.trim()) data.set('slug', values.slug.trim());
-    data.set('sku', values.sku.trim());
+    data.set("title", values.title.trim());
+    if (values.slug.trim()) data.set("slug", values.slug.trim());
+    data.set("sku", values.sku.trim());
     if (values.shortDescription.trim()) {
-      data.set('shortDescription', values.shortDescription.trim());
+      data.set("shortDescription", values.shortDescription.trim());
     }
-    data.set('description', values.description.trim());
-    data.set('brand', values.brand.trim());
-    data.set('category', values.category);
-    data.set('price', String(values.price));
+    data.set("description", values.description.trim());
+    data.set("brand", values.brand.trim());
+    data.set("category", values.category);
+    data.set("price", String(values.price));
     if (values.compareAtPrice && !Number.isNaN(values.compareAtPrice)) {
-      data.set('compareAtPrice', String(values.compareAtPrice));
+      data.set("compareAtPrice", String(values.compareAtPrice));
     }
-    data.set('quantity', String(values.quantity));
-    data.set('status', values.status);
-    data.set('isFeatured', String(values.isFeatured));
-    data.set('isTrending', String(values.isTrending));
-    data.set('isBestSeller', String(values.isBestSeller));
+    data.set("quantity", String(values.quantity));
+    data.set("status", values.status);
+    data.set("isFeatured", String(values.isFeatured));
+    data.set("isTrending", String(values.isTrending));
+    data.set("isBestSeller", String(values.isBestSeller));
     if (values.offerStartsAt) {
-      data.set('offerStartsAt', new Date(values.offerStartsAt).toISOString());
+      data.set("offerStartsAt", new Date(values.offerStartsAt).toISOString());
     }
     if (values.offerEndsAt) {
-      data.set('offerEndsAt', new Date(values.offerEndsAt).toISOString());
+      data.set("offerEndsAt", new Date(values.offerEndsAt).toISOString());
     }
     if (values.publishedAt) {
-      data.set('publishedAt', new Date(values.publishedAt).toISOString());
+      data.set("publishedAt", new Date(values.publishedAt).toISOString());
     }
-    data.set('specifications', JSON.stringify(specifications));
-    files.forEach((file) => data.append('images', file));
+    data.set("specifications", JSON.stringify(specifications));
+    files.forEach((file) => data.append("images", file));
 
     try {
       const saved = await apiFetch<Product>(
-        product ? `/products/${product.id}` : '/products',
-        { method: product ? 'PATCH' : 'POST', body: data },
+        product ? `/products/${product.id}` : "/products",
+        { method: product ? "PATCH" : "POST", body: data },
         accessToken,
       );
-      queryClient.setQueryData(['products', 'detail', String(saved.id)], saved);
-      await queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-      await queryClient.invalidateQueries({ queryKey: ['products'] });
-      toast.success(product ? 'Product updated' : 'Product created');
-      router.push('/admin/products');
+      queryClient.setQueryData(["products", "detail", String(saved.id)], saved);
+      await queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success(product ? "Product updated" : "Product created");
+      router.push("/admin/products");
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Unable to save product',
+        error instanceof Error ? error.message : "Unable to save product",
       );
     }
   });
 
   const removeImage = useMutation({
-    mutationFn: (imageId: number) =>
+    mutationFn: (imageId: string) =>
       apiFetch<Product>(
         `/products/${product?.id}/images/${imageId}`,
-        { method: 'DELETE' },
+        { method: "DELETE" },
         accessToken,
       ),
     onSuccess: (updated) => {
       setExistingImages(updated.images);
       queryClient.setQueryData(
-        ['admin', 'product', String(product?.id)],
+        ["admin", "product", String(product?.id)],
         updated,
       );
-      toast.success('Image removed');
+      toast.success("Image removed");
       router.refresh();
     },
     onError: (error: Error) => toast.error(error.message),
@@ -199,7 +199,7 @@ export function ProductForm({ product }: { product?: Product }) {
     if (!selected.length) return;
     if (selected.length > imageSlotsLeft) {
       toast.error(
-        `You can add ${imageSlotsLeft} more image${imageSlotsLeft === 1 ? '' : 's'}.`,
+        `You can add ${imageSlotsLeft} more image${imageSlotsLeft === 1 ? "" : "s"}.`,
       );
       return;
     }
@@ -215,8 +215,8 @@ export function ProductForm({ product }: { product?: Product }) {
         <ArrowLeft size={16} /> Back to products
       </Link>
       <AdminPageHeader
-        eyebrow={product ? 'Catalog editor' : 'New catalog item'}
-        title={product ? 'Edit product.' : 'Create product.'}
+        eyebrow={product ? "Catalog editor" : "New catalog item"}
+        title={product ? "Edit product." : "Create product."}
         action={
           <Button
             form="product-form"
@@ -224,7 +224,7 @@ export function ProductForm({ product }: { product?: Product }) {
             loading={isSubmitting}
             className="h-12"
           >
-            <Save size={17} /> {product ? 'Save changes' : 'Publish product'}
+            <Save size={17} /> {product ? "Save changes" : "Publish product"}
           </Button>
         }
       />
@@ -243,11 +243,11 @@ export function ProductForm({ product }: { product?: Product }) {
             <Field label="Product title" error={errors.title?.message}>
               <Input
                 placeholder="e.g. Pixel 9 Pro"
-                {...register('title', {
-                  required: 'Product title is required.',
+                {...register("title", {
+                  required: "Product title is required.",
                   minLength: {
                     value: 2,
-                    message: 'Use at least 2 characters.',
+                    message: "Use at least 2 characters.",
                   },
                 })}
               />
@@ -255,26 +255,26 @@ export function ProductForm({ product }: { product?: Product }) {
             <Field label="SKU" error={errors.sku?.message}>
               <Input
                 placeholder="e.g. MOB-PIX9P-256"
-                {...register('sku', { required: 'SKU is required.' })}
+                {...register("sku", { required: "SKU is required." })}
               />
             </Field>
             <Field
               label="Slug"
               hint="Optional. Generated from the title when blank."
             >
-              <Input placeholder="pixel-9-pro" {...register('slug')} />
+              <Input placeholder="pixel-9-pro" {...register("slug")} />
             </Field>
             <Field label="Brand" error={errors.brand?.message}>
               <Input
                 placeholder="Google"
-                {...register('brand', { required: 'Brand is required.' })}
+                {...register("brand", { required: "Brand is required." })}
               />
             </Field>
             <Field label="Category" error={errors.category?.message}>
               <Select
-                value={watch('category')}
+                value={watch("category")}
                 onValueChange={(value) =>
-                  setValue('category', value as Category, {
+                  setValue("category", value as Category, {
                     shouldValidate: true,
                   })
                 }
@@ -287,14 +287,14 @@ export function ProductForm({ product }: { product?: Product }) {
               label="Short description"
               hint="Shown in compact product summaries."
             >
-              <Input maxLength={240} {...register('shortDescription')} />
+              <Input maxLength={240} {...register("shortDescription")} />
             </Field>
           </div>
           <Field label="Full description" error={errors.description?.message}>
             <Textarea
               rows={6}
-              {...register('description', {
-                required: 'Description is required.',
+              {...register("description", {
+                required: "Description is required.",
               })}
             />
           </Field>
@@ -311,10 +311,10 @@ export function ProductForm({ product }: { product?: Product }) {
                 type="number"
                 min={1}
                 step="0.01"
-                {...register('price', {
+                {...register("price", {
                   valueAsNumber: true,
-                  required: 'Price is required.',
-                  min: { value: 1, message: 'Price must be positive.' },
+                  required: "Price is required.",
+                  min: { value: 1, message: "Price must be positive." },
                 })}
               />
             </Field>
@@ -323,25 +323,25 @@ export function ProductForm({ product }: { product?: Product }) {
                 type="number"
                 min={1}
                 step="0.01"
-                {...register('compareAtPrice', { valueAsNumber: true })}
+                {...register("compareAtPrice", { valueAsNumber: true })}
               />
             </Field>
             <Field label="Stock quantity" error={errors.quantity?.message}>
               <Input
                 type="number"
                 min={0}
-                {...register('quantity', {
+                {...register("quantity", {
                   valueAsNumber: true,
-                  required: 'Stock is required.',
-                  min: { value: 0, message: 'Stock cannot be negative.' },
+                  required: "Stock is required.",
+                  min: { value: 0, message: "Stock cannot be negative." },
                 })}
               />
             </Field>
             <Field label="Catalog status">
               <Select
-                value={watch('status')}
+                value={watch("status")}
                 onValueChange={(value) =>
-                  setValue('status', value as Product['status'])
+                  setValue("status", value as Product["status"])
                 }
                 options={statusOptions}
                 ariaLabel="Catalog status"
@@ -354,7 +354,7 @@ export function ProductForm({ product }: { product?: Product }) {
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-[#b4472f]"
-                {...register('isFeatured')}
+                {...register("isFeatured")}
               />
               <Star size={16} />
               <span className="text-sm font-bold">Featured product</span>
@@ -363,7 +363,7 @@ export function ProductForm({ product }: { product?: Product }) {
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-[#b4472f]"
-                {...register('isTrending')}
+                {...register("isTrending")}
               />
               <Star size={16} />
               <span className="text-sm font-bold">Trending</span>
@@ -372,7 +372,7 @@ export function ProductForm({ product }: { product?: Product }) {
               <input
                 type="checkbox"
                 className="h-4 w-4 accent-[#b4472f]"
-                {...register('isBestSeller')}
+                {...register("isBestSeller")}
               />
               <Star size={16} />
               <span className="text-sm font-bold">Best seller</span>
@@ -380,16 +380,16 @@ export function ProductForm({ product }: { product?: Product }) {
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
             <Field label="Published at">
-              <Input type="datetime-local" {...register('publishedAt')} />
+              <Input type="datetime-local" {...register("publishedAt")} />
             </Field>
             <Field
               label="Offer starts"
               hint="Optional; requires a compare-at price."
             >
-              <Input type="datetime-local" {...register('offerStartsAt')} />
+              <Input type="datetime-local" {...register("offerStartsAt")} />
             </Field>
             <Field label="Offer ends">
-              <Input type="datetime-local" {...register('offerEndsAt')} />
+              <Input type="datetime-local" {...register("offerEndsAt")} />
             </Field>
           </div>
         </FormSection>
@@ -405,8 +405,8 @@ export function ProductForm({ product }: { product?: Product }) {
             </span>
             <span className="mt-1 text-xs text-black/40">
               {imageSlotsLeft
-                ? `${imageSlotsLeft} image slot${imageSlotsLeft === 1 ? '' : 's'} remaining`
-                : 'Maximum 4 images added'}
+                ? `${imageSlotsLeft} image slot${imageSlotsLeft === 1 ? "" : "s"} remaining`
+                : "Maximum 4 images added"}
             </span>
             <input
               type="file"
@@ -416,7 +416,7 @@ export function ProductForm({ product }: { product?: Product }) {
               className="sr-only"
               onChange={(event) => {
                 selectImages(Array.from(event.target.files ?? []));
-                event.target.value = '';
+                event.target.value = "";
               }}
             />
           </label>
@@ -484,7 +484,7 @@ export function ProductForm({ product }: { product?: Product }) {
               rows={8}
               spellCheck={false}
               className="bg-[#1d1f1c] font-mono text-white"
-              {...register('specifications')}
+              {...register("specifications")}
             />
           </Field>
         </FormSection>
@@ -496,7 +496,7 @@ export function ProductForm({ product }: { product?: Product }) {
             </Button>
           </Link>
           <Button type="submit" loading={isSubmitting}>
-            <Save size={17} /> {product ? 'Save changes' : 'Publish product'}
+            <Save size={17} /> {product ? "Save changes" : "Publish product"}
           </Button>
         </div>
       </form>
@@ -505,7 +505,7 @@ export function ProductForm({ product }: { product?: Product }) {
 }
 
 function toDateTimeLocal(value?: string | null): string {
-  if (!value) return '';
+  if (!value) return "";
   const date = new Date(value);
   const timezoneOffset = date.getTimezoneOffset() * 60_000;
   return new Date(date.getTime() - timezoneOffset).toISOString().slice(0, 16);
@@ -525,7 +525,7 @@ function FormSection({
   return (
     <section
       className={cn(
-        'rounded-[2rem] border bg-white/55 p-6 shadow-soft sm:p-8',
+        "rounded-[2rem] border bg-white/55 p-6 shadow-soft sm:p-8",
         className,
       )}
     >

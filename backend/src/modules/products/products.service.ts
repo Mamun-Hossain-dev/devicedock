@@ -89,9 +89,9 @@ export class ProductsService {
   }
 
   async adjustStock(
-    id: number,
+    id: string,
     quantity: number,
-    adjustedById: number,
+    adjustedById: string,
     reason: string,
   ) {
     const result = await this.productsRepository.adjustStock(
@@ -109,7 +109,7 @@ export class ProductsService {
     return result;
   }
 
-  async getProductById(id: number): Promise<Product> {
+  async getProductById(id: string): Promise<Product> {
     const product = await this.productsRepository.findById(id);
 
     if (!product) {
@@ -122,7 +122,7 @@ export class ProductsService {
     return product;
   }
 
-  async getPublicProductById(id: number): Promise<Product> {
+  async getPublicProductById(id: string): Promise<Product> {
     const product = await this.getProductById(id);
     if (
       product.status !== ProductStatus.ACTIVE ||
@@ -173,7 +173,7 @@ export class ProductsService {
   }
 
   async updateProduct(
-    id: number,
+    id: string,
     input: UpdateProductRequest,
     files: FileToStore[] = [],
   ): Promise<Product> {
@@ -220,7 +220,7 @@ export class ProductsService {
     return updatedProduct;
   }
 
-  async deleteProduct(id: number): Promise<void> {
+  async deleteProduct(id: string): Promise<void> {
     const product = await this.productsRepository.findById(id);
     if (!product) {
       throw new AppException('Product not found', {
@@ -233,7 +233,7 @@ export class ProductsService {
     await this.deleteFilesSafely(product.images.map((image) => image.publicId));
   }
 
-  async removeImage(productId: number, imageId: number): Promise<Product> {
+  async removeImage(productId: string, imageId: string): Promise<Product> {
     await this.getProductById(productId);
     const image = await this.productsRepository.findImage(productId, imageId);
 

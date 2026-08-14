@@ -21,7 +21,7 @@ export function CartPage() {
   const { items, hydrated, updateQuantity, removeItem, clear } = useCart();
   const router = useRouter();
   const [clearOpen, setClearOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const initializedSelection = useRef(false);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export function CartPage() {
   );
   const allSelected = selectedIds.size === items.length;
 
-  const toggleItem = (productId: number) => {
+  const toggleItem = (productId: string) => {
     setSelectedIds((current) => {
       const next = new Set(current);
       if (next.has(productId)) next.delete(productId);
@@ -186,10 +186,7 @@ export function CartPage() {
                     <p className="text-[11px] font-bold uppercase tracking-wider text-black/40">
                       {item.product.brand}
                     </p>
-                    <Link
-                      href={`/products/${item.productId}`}
-                      prefetch={false}
-                    >
+                    <Link href={`/products/${item.productId}`} prefetch={false}>
                       <h2 className="display mt-1 text-xl sm:text-2xl">
                         {item.product.title}
                       </h2>

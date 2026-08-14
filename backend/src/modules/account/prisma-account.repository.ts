@@ -3,20 +3,20 @@ import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import type { AccountRepository } from './account.repository';
 import type { SaveAddressDto } from './dto/account.dto';
 
-const productInclude = { images: { orderBy: { id: 'asc' as const } } };
+const productInclude = { images: { orderBy: { createdAt: 'asc' as const } } };
 
 @Injectable()
 export class PrismaAccountRepository implements AccountRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  listAddresses(userId: number) {
+  listAddresses(userId: string) {
     return this.prisma.address.findMany({
       where: { userId },
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
     });
   }
 
-  async createAddress(userId: number, input: SaveAddressDto) {
+  async createAddress(userId: string, input: SaveAddressDto) {
     return this.prisma.$transaction(async (prisma) => {
       const count = await prisma.address.count({ where: { userId } });
       const isDefault = input.isDefault || count === 0;
@@ -32,7 +32,7 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  async updateAddress(userId: number, id: number, input: SaveAddressDto) {
+  async updateAddress(userId: string, id: string, input: SaveAddressDto) {
     return this.prisma.$transaction(async (prisma) => {
       const existing = await prisma.address.findFirst({
         where: { id, userId },
@@ -51,7 +51,7 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  async deleteAddress(userId: number, id: number) {
+  async deleteAddress(userId: string, id: string) {
     return this.prisma.$transaction(async (prisma) => {
       const existing = await prisma.address.findFirst({
         where: { id, userId },
@@ -74,7 +74,7 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  listWishlist(userId: number) {
+  listWishlist(userId: string) {
     return this.prisma.wishlistItem.findMany({
       where: { userId, product: { status: 'ACTIVE' } },
       orderBy: { createdAt: 'desc' },
@@ -82,7 +82,7 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  addWishlist(userId: number, productId: number) {
+  addWishlist(userId: string, productId: string) {
     return this.prisma.wishlistItem.upsert({
       where: { userId_productId: { userId, productId } },
       update: {},
@@ -91,14 +91,14 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  async removeWishlist(userId: number, productId: number) {
+  async removeWishlist(userId: string, productId: string) {
     const result = await this.prisma.wishlistItem.deleteMany({
       where: { userId, productId },
     });
     return result.count > 0;
   }
 
-  getNotificationPreferences(userId: number) {
+  getNotificationPreferences(userId: string) {
     return this.prisma.notificationPreference.upsert({
       where: { userId },
       update: {},
@@ -107,7 +107,7 @@ export class PrismaAccountRepository implements AccountRepository {
   }
 
   updateNotificationPreferences(
-    userId: number,
+    userId: string,
     input: {
       orderUpdates?: boolean;
       productUpdates?: boolean;
@@ -121,7 +121,7 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  listNotifications(userId: number) {
+  listNotifications(userId: string) {
     return this.prisma.notification.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
@@ -129,7 +129,7 @@ export class PrismaAccountRepository implements AccountRepository {
     });
   }
 
-  async markNotificationRead(userId: number, id: number) {
+  async markNotificationRead(userId: string, id: string) {
     const result = await this.prisma.notification.updateMany({
       where: { id, userId },
       data: { readAt: new Date() },
@@ -138,7 +138,7 @@ export class PrismaAccountRepository implements AccountRepository {
   }
 
   async createNotification(
-    userId: number,
+    userId: string,
     input: { type: string; title: string; message: string },
   ) {
     await this.prisma.notification.create({ data: { userId, ...input } });

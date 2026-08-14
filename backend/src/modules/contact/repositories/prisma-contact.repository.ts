@@ -57,7 +57,7 @@ export class PrismaContactRepository implements ContactRepository {
   }
 
   async updateStatus(
-    id: number,
+    id: string,
     status: ContactStatus,
   ): Promise<ContactMessage | null> {
     const result = await this.prisma.contactMessage.updateMany({

@@ -19,7 +19,7 @@ export const ProductStatus = {
 export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus];
 
 export interface Product {
-  id: number;
+  id: string;
   slug: string;
   sku: string;
   title: string;
@@ -42,10 +42,10 @@ export interface Product {
 }
 
 export interface ProductImage {
-  id: number;
+  id: string;
   url: string;
   publicId: string;
-  productId: number;
+  productId: string;
 }
 
 export interface NewProductImage {
@@ -158,7 +158,7 @@ export interface CatalogOperationsSummary {
 export interface StockAdjustment {
   product: Product;
   movement: {
-    id: number;
+    id: string;
     previousStock: number;
     newStock: number;
     change: number;

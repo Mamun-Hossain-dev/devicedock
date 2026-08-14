@@ -1,11 +1,8 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsString, Length, Min } from 'class-validator';
+import { IsString, IsUUID, Length } from 'class-validator';
 
 export class CreateRefundRequestDto {
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  orderId!: number;
+  @IsUUID()
+  orderId!: string;
 
   @IsString()
   @Length(3, 500)

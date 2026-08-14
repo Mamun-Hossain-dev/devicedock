@@ -21,7 +21,7 @@ export function WishlistPage() {
     enabled: Boolean(accessToken),
   });
   const remove = useMutation({
-    mutationFn: (productId: number) =>
+    mutationFn: (productId: string) =>
       apiFetch<null>(
         `/account/wishlist/${productId}`,
         { method: "DELETE" },

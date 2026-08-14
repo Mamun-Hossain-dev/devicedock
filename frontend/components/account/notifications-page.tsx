@@ -48,7 +48,7 @@ export function NotificationsPage() {
     onError: (error: Error) => toast.error(error.message),
   });
   const read = useMutation({
-    mutationFn: (id: number) =>
+    mutationFn: (id: string) =>
       apiFetch<null>(
         `/account/notifications/${id}/read`,
         { method: "PATCH" },

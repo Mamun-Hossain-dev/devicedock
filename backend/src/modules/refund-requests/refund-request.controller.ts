@@ -3,7 +3,7 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -45,7 +45,7 @@ export class RefundRequestController {
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @ResponseMessage('Refund request fetched successfully')
-  findOneForAdmin(@Param('id', ParseIntPipe) id: number) {
+  findOneForAdmin(@Param('id', ParseUUIDPipe) id: string) {
     return this.refundRequestService.findOneForAdmin(id);
   }
 
@@ -55,7 +55,7 @@ export class RefundRequestController {
   @ResponseMessage('Refund request approved')
   approve(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: DecideRefundRequestDto,
   ) {
     return this.refundRequestService.approve(user.id, id, dto.note, dto.amount);
@@ -67,7 +67,7 @@ export class RefundRequestController {
   @ResponseMessage('Refund request denied')
   deny(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: DecideRefundRequestDto,
   ) {
     return this.refundRequestService.deny(user.id, id, dto.note);
@@ -86,7 +86,7 @@ export class RefundRequestController {
   @ResponseMessage('Refund request fetched successfully')
   findOne(
     @CurrentUser() user: PublicUser,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.refundRequestService.findOne(user.id, id);
   }

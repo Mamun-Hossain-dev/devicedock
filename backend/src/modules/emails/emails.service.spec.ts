@@ -31,7 +31,10 @@ describe('EmailsService', () => {
 
   it('sends an HTML welcome email with an inline image', async () => {
     const configService = {
-      get: jest.fn().mockReturnValue(true),
+      get: jest.fn((key: string) => {
+        if (key === 'email.siteUrl') return 'https://devicedock.duckdns.org';
+        return true;
+      }),
       getOrThrow: jest.fn().mockReturnValue('Nest API <hello@example.com>'),
     } as unknown as ConfigService;
     const service = new EmailsService(

@@ -31,7 +31,7 @@ export class OrdersService {
     private readonly paymentEventsPublisher: PaymentEventsPublisher,
   ) {}
 
-  findAll(userId: number, options: PaginationOptions) {
+  findAll(userId: string, options: PaginationOptions) {
     return this.repository.findAllByUser(userId, options);
   }
 
@@ -39,19 +39,19 @@ export class OrdersService {
     return this.repository.findAll(options);
   }
 
-  async findOne(userId: number, orderId: number) {
+  async findOne(userId: string, orderId: string) {
     const order = await this.repository.findById(userId, orderId);
     if (!order) throw this.orderNotFound();
     return order;
   }
 
-  async findOneForAdmin(orderId: number) {
+  async findOneForAdmin(orderId: string) {
     const order = await this.repository.findByIdForAdmin(orderId);
     if (!order) throw this.orderNotFound();
     return order;
   }
 
-  async updateStatusForAdmin(orderId: number, status: OrderStatus) {
+  async updateStatusForAdmin(orderId: string, status: OrderStatus) {
     const order = await this.repository.findByIdForAdmin(orderId);
     if (!order) throw this.orderNotFound();
     if (!statusTransitions[order.status]?.includes(status)) {
@@ -67,7 +67,7 @@ export class OrdersService {
     return this.repository.updateStatus(orderId, status);
   }
 
-  async deleteForAdmin(orderId: number): Promise<void> {
+  async deleteForAdmin(orderId: string): Promise<void> {
     const order = await this.repository.findByIdForAdmin(orderId);
     if (!order) throw this.orderNotFound();
     if (order.status !== 'PAYMENT_PENDING' && order.status !== 'CANCELLED') {
@@ -81,19 +81,19 @@ export class OrdersService {
     }
   }
 
-  async generateInvoice(userId: number, orderId: number): Promise<Buffer> {
+  async generateInvoice(userId: string, orderId: string): Promise<Buffer> {
     const data = await this.repository.getInvoiceData(userId, orderId);
     if (!data) throw this.invoiceNotAvailable();
     return this.invoiceService.generate(data);
   }
 
-  async generateInvoiceForAdmin(orderId: number): Promise<Buffer> {
+  async generateInvoiceForAdmin(orderId: string): Promise<Buffer> {
     const data = await this.repository.getInvoiceDataForAdmin(orderId);
     if (!data) throw this.invoiceNotAvailable();
     return this.invoiceService.generate(data);
   }
 
-  async resendConfirmationForAdmin(orderId: number) {
+  async resendConfirmationForAdmin(orderId: string) {
     const data = await this.repository.getInvoiceDataForAdmin(orderId);
     if (!data) throw this.invoiceNotAvailable();
     const event = { ...data, eventId: `resend-${randomUUID()}` };

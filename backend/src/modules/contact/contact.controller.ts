@@ -3,7 +3,7 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -43,7 +43,7 @@ export class ContactController {
   @Roles(Role.ADMIN)
   @ResponseMessage('Contact message status updated')
   updateStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateContactStatusDto,
   ) {
     return this.contactService.updateStatus(id, dto.status);

@@ -2,10 +2,10 @@ import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEnum,
-  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -63,8 +63,8 @@ export class SaveAddressDto {
 }
 
 export class AddWishlistDto {
-  @IsInt()
-  productId!: number;
+  @IsUUID()
+  productId!: string;
 }
 
 export class UpdateNotificationPreferencesDto {

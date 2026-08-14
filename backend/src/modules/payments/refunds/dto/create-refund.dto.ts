@@ -12,10 +12,8 @@ import { PaginationQueryDto } from '../../../../common/dto/pagination-query.dto'
 import type { RefundStatus } from '../interfaces/refund.interface';
 
 export class CreateRefundDto {
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  paymentId!: number;
+  @IsUUID()
+  paymentId!: string;
 
   @IsOptional()
   @Type(() => Number)
@@ -38,8 +36,6 @@ export class RefundQueryDto extends PaginationQueryDto {
   status?: RefundStatus;
 
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  paymentId?: number;
+  @IsUUID()
+  paymentId?: string;
 }

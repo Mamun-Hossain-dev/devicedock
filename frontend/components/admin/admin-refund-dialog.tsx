@@ -21,7 +21,7 @@ export function AdminRefundDialog({
 }: {
   open: boolean;
   onOpenChange(open: boolean): void;
-  paymentId?: number | null;
+  paymentId?: string | null;
   paymentAmount?: number;
   currency?: string;
 }) {
@@ -49,7 +49,9 @@ export function AdminRefundDialog({
           method: "POST",
           body: JSON.stringify({
             paymentId: Number(paymentIdValue),
-            ...(amount.trim() ? { amount: Math.round(Number(amount) * 100) } : {}),
+            ...(amount.trim()
+              ? { amount: Math.round(Number(amount) * 100) }
+              : {}),
             ...(reason.trim() ? { reason: reason.trim() } : {}),
             idempotencyKey: crypto.randomUUID(),
           }),
@@ -58,9 +60,7 @@ export function AdminRefundDialog({
       ),
     onSuccess: (refund) => {
       toast.success(
-        refund.status === "SUCCEEDED"
-          ? "Refund completed"
-          : "Refund requested",
+        refund.status === "SUCCEEDED" ? "Refund completed" : "Refund requested",
       );
       onOpenChange(false);
       void queryClient.invalidateQueries({ queryKey: ["admin", "refunds"] });
@@ -85,8 +85,8 @@ export function AdminRefundDialog({
             Request a refund
           </Dialog.Title>
           <Dialog.Description className="mt-3 text-sm leading-6 text-black/55">
-            Return a payment to your customer. You can refund the full amount
-            or a partial amount.
+            Return a payment to your customer. You can refund the full amount or
+            a partial amount.
           </Dialog.Description>
 
           <form

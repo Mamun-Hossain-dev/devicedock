@@ -21,7 +21,7 @@ import {
 
 const paymentInclude = {
   order: {
-    include: { items: { orderBy: { id: 'asc' as const } } },
+    include: { items: { orderBy: { createdAt: 'asc' as const } } },
   },
 };
 
@@ -29,7 +29,7 @@ const paymentInclude = {
 export class PrismaPaymentRepository implements PaymentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findById(paymentId: number): Promise<PaymentView | null> {
+  findById(paymentId: string): Promise<PaymentView | null> {
     return this.prisma.payment.findUnique({
       where: { id: paymentId },
       include: paymentInclude,
@@ -37,7 +37,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
   }
 
   findByIdempotencyKey(
-    userId: number,
+    userId: string,
     idempotencyKey: string,
   ): Promise<PaymentView | null> {
     return this.prisma.payment.findFirst({
@@ -46,7 +46,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
     });
   }
 
-  findActiveByUser(userId: number): Promise<PaymentView | null> {
+  findActiveByUser(userId: string): Promise<PaymentView | null> {
     return this.prisma.payment.findFirst({
       where: {
         order: { userId },
@@ -57,7 +57,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
     });
   }
 
-  findByOrderId(orderId: number): Promise<PaymentView | null> {
+  findByOrderId(orderId: string): Promise<PaymentView | null> {
     return this.prisma.payment.findFirst({
       where: { orderId },
       orderBy: { createdAt: 'desc' },
@@ -66,8 +66,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
   }
 
   findOwnedById(
-    userId: number,
-    paymentId: number,
+    userId: string,
+    paymentId: string,
   ): Promise<PaymentView | null> {
     return this.prisma.payment.findFirst({
       where: { id: paymentId, order: { userId } },
@@ -76,7 +76,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
   }
 
   createPendingFromItems(
-    userId: number,
+    userId: string,
     checkoutItems: CheckoutItemInput[],
     options: CheckoutOptions,
     idempotencyKey: string,
@@ -230,7 +230,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
   }
 
   attachProviderIntent(
-    paymentId: number,
+    paymentId: string,
     providerIntentId: string,
   ): Promise<PaymentView> {
     return this.prisma.payment.update({
@@ -241,7 +241,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
   }
 
   async markCreationFailed(
-    paymentId: number,
+    paymentId: string,
     code: string,
     message: string,
   ): Promise<void> {
@@ -262,7 +262,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
     });
   }
 
-  async markCancelled(paymentId: number, reason: string): Promise<void> {
+  async markCancelled(paymentId: string, reason: string): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
       const payment = await prisma.payment.update({
         where: { id: paymentId },
@@ -280,7 +280,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
     });
   }
 
-  async markRefundedAndCancel(paymentId: number): Promise<void> {
+  async markRefundedAndCancel(paymentId: string): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
       const refundedAt = new Date();
       const payment = await prisma.payment.update({
@@ -333,8 +333,8 @@ export class PrismaPaymentRepository implements PaymentRepository {
           where: { providerIntentId: event.paymentIntentId },
           include: paymentInclude,
         });
-        const metadataPaymentId = Number(event.metadata?.paymentId);
-        if (!payment && Number.isInteger(metadataPaymentId)) {
+        const metadataPaymentId = event.metadata?.paymentId;
+        if (!payment && metadataPaymentId) {
           const candidate = await prisma.payment.findUnique({
             where: { id: metadataPaymentId },
             include: paymentInclude,
@@ -505,7 +505,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
 
   private async redeemCouponReservation(
     prisma: Prisma.TransactionClient,
-    orderId: number,
+    orderId: string,
   ) {
     const redemption = await prisma.couponRedemption.findUnique({
       where: { orderId },
@@ -523,7 +523,7 @@ export class PrismaPaymentRepository implements PaymentRepository {
 
   private async releaseCouponReservation(
     prisma: Prisma.TransactionClient,
-    orderId: number,
+    orderId: string,
   ) {
     const redemption = await prisma.couponRedemption.findUnique({
       where: { orderId },

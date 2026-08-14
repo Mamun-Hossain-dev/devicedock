@@ -13,14 +13,14 @@ export class CartService {
     private readonly productsService: ProductsService,
   ) {}
 
-  async getCart(userId: number): Promise<CartView> {
+  async getCart(userId: string): Promise<CartView> {
     const cart = await this.cartRepository.findByUserId(userId);
-    return this.toView(cart ?? { id: 0, userId, items: [] });
+    return this.toView(cart ?? { id: null, userId, items: [] });
   }
 
   async addItem(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     quantity: number,
   ): Promise<CartView> {
     const [product, cart] = await Promise.all([
@@ -41,8 +41,8 @@ export class CartService {
   }
 
   async updateItem(
-    userId: number,
-    productId: number,
+    userId: string,
+    productId: string,
     quantity: number,
   ): Promise<CartView> {
     const [product, cart] = await Promise.all([
@@ -63,13 +63,13 @@ export class CartService {
     );
   }
 
-  async removeItem(userId: number, productId: number): Promise<CartView> {
+  async removeItem(userId: string, productId: string): Promise<CartView> {
     return this.toView(await this.cartRepository.removeItem(userId, productId));
   }
 
-  async clear(userId: number): Promise<CartView> {
+  async clear(userId: string): Promise<CartView> {
     const cart = await this.cartRepository.clear(userId);
-    return this.toView(cart ?? { id: 0, userId, items: [] });
+    return this.toView(cart ?? { id: null, userId, items: [] });
   }
 
   private assertStock(available: number, requested: number): void {

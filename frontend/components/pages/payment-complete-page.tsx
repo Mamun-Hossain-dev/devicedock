@@ -117,13 +117,15 @@ function PaymentStatusSkeleton() {
   );
 }
 
-function readSelectedProductIds(): number[] {
+function readSelectedProductIds(): string[] {
   try {
     const value = JSON.parse(
       window.sessionStorage.getItem(CHECKOUT_SELECTION_KEY) ?? "[]",
     ) as unknown;
     return Array.isArray(value)
-      ? value.filter((id): id is number => Number.isInteger(id))
+      ? value.filter(
+          (id): id is string => typeof id === "string" && id.length > 0,
+        )
       : [];
   } catch {
     return [];

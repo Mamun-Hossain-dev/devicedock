@@ -3,30 +3,30 @@ import type { SaveAddressDto } from './dto/account.dto';
 export const ACCOUNT_REPOSITORY = Symbol('ACCOUNT_REPOSITORY');
 
 export interface AccountRepository {
-  listAddresses(userId: number): Promise<unknown[]>;
-  createAddress(userId: number, input: SaveAddressDto): Promise<unknown>;
+  listAddresses(userId: string): Promise<unknown[]>;
+  createAddress(userId: string, input: SaveAddressDto): Promise<unknown>;
   updateAddress(
-    userId: number,
-    id: number,
+    userId: string,
+    id: string,
     input: SaveAddressDto,
   ): Promise<unknown>;
-  deleteAddress(userId: number, id: number): Promise<boolean>;
-  listWishlist(userId: number): Promise<unknown[]>;
-  addWishlist(userId: number, productId: number): Promise<unknown>;
-  removeWishlist(userId: number, productId: number): Promise<boolean>;
-  getNotificationPreferences(userId: number): Promise<unknown>;
+  deleteAddress(userId: string, id: string): Promise<boolean>;
+  listWishlist(userId: string): Promise<unknown[]>;
+  addWishlist(userId: string, productId: string): Promise<unknown>;
+  removeWishlist(userId: string, productId: string): Promise<boolean>;
+  getNotificationPreferences(userId: string): Promise<unknown>;
   updateNotificationPreferences(
-    userId: number,
+    userId: string,
     input: {
       orderUpdates?: boolean;
       productUpdates?: boolean;
       emailUpdates?: boolean;
     },
   ): Promise<unknown>;
-  listNotifications(userId: number): Promise<unknown[]>;
-  markNotificationRead(userId: number, id: number): Promise<boolean>;
+  listNotifications(userId: string): Promise<unknown[]>;
+  markNotificationRead(userId: string, id: string): Promise<boolean>;
   createNotification(
-    userId: number,
+    userId: string,
     input: { type: string; title: string; message: string },
   ): Promise<void>;
 }

@@ -150,8 +150,8 @@ export class PaymentService {
   }
 
   async getPayment(
-    userId: number,
-    paymentId: number,
+    userId: string,
+    paymentId: string,
   ): Promise<PublicPaymentView> {
     const payment = await this.repository.findOwnedById(userId, paymentId);
     if (!payment) throw this.paymentNotFound();
@@ -162,8 +162,8 @@ export class PaymentService {
   }
 
   async getCheckoutSession(
-    userId: number,
-    paymentId: number,
+    userId: string,
+    paymentId: string,
   ): Promise<CheckoutSession> {
     const payment = await this.repository.findOwnedById(userId, paymentId);
     if (!payment) throw this.paymentNotFound();
@@ -177,7 +177,7 @@ export class PaymentService {
     return this.restoreSession(payment);
   }
 
-  async cancelForOrderDeletion(orderId: number): Promise<void> {
+  async cancelForOrderDeletion(orderId: string): Promise<void> {
     const payment = await this.repository.findByOrderId(orderId);
     if (!payment) return;
     if (payment.status === 'SUCCEEDED' || payment.status === 'REFUNDED') {
@@ -207,7 +207,7 @@ export class PaymentService {
     );
   }
 
-  async cancelForAdmin(orderId: number): Promise<void> {
+  async cancelForAdmin(orderId: string): Promise<void> {
     const payment = await this.repository.findByOrderId(orderId);
     if (!payment) return;
     if (payment.status === 'REFUNDED' || payment.status === 'CANCELLED') return;
@@ -253,8 +253,8 @@ export class PaymentService {
   }
 
   async getRefundablePaymentForOrder(
-    orderId: number,
-  ): Promise<{ id: number } | null> {
+    orderId: string,
+  ): Promise<{ id: string } | null> {
     const payment = await this.repository.findByOrderId(orderId);
     if (!payment || payment.status !== 'SUCCEEDED') return null;
     if (!payment.providerIntentId) {
@@ -267,8 +267,8 @@ export class PaymentService {
   }
 
   async requestRefund(
-    paymentId: number,
-    requestedByUserId: number,
+    paymentId: string,
+    requestedByUserId: string,
     amount: number | undefined,
     reason: string | undefined,
     idempotencyKey: string,
@@ -433,7 +433,7 @@ export class PaymentService {
 
   private assertRefundRequestMatches(
     refund: RefundView,
-    paymentId: number,
+    paymentId: string,
     amount?: number,
   ): void {
     if (
@@ -563,10 +563,12 @@ export class PaymentService {
       this.minorUnit,
     );
     const expectedCoupon = options.couponCode?.trim().toUpperCase() || null;
-    const requestedItems = [...items].sort((a, b) => a.productId - b.productId);
+    const requestedItems = [...items].sort((a, b) =>
+      a.productId.localeCompare(b.productId),
+    );
     const savedItems = payment.order.items
       .map(({ productId, quantity }) => ({ productId, quantity }))
-      .sort((a, b) => (a.productId ?? 0) - (b.productId ?? 0));
+      .sort((a, b) => (a.productId ?? '').localeCompare(b.productId ?? ''));
 
     return (
       payment.currency.toLowerCase() === this.currency &&

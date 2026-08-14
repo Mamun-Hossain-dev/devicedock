@@ -24,7 +24,7 @@ import { apiFetch, minorMoney } from "@/lib/api";
 import type { Order } from "@/lib/types";
 import { DetailPageSkeleton } from "@/components/ui/skeleton";
 
-export function AdminOrderDetails({ orderId }: { orderId: number }) {
+export function AdminOrderDetails({ orderId }: { orderId: string }) {
   const { accessToken } = useAuth();
   const [refundOpen, setRefundOpen] = useState(false);
   const query = useQuery({
@@ -193,7 +193,10 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
                 <div className="flex justify-between gap-4">
                   <dt className="text-white/45">Paid</dt>
                   <dd>
-                    {minorMoney(order.payments?.[0]?.amount ?? 0, order.currency)}
+                    {minorMoney(
+                      order.payments?.[0]?.amount ?? 0,
+                      order.currency,
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -254,5 +257,7 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
 }
 
 export function canRefundOrder(order: Order): boolean {
-  return Boolean(order.payments?.some((payment) => payment.status === "SUCCEEDED"));
+  return Boolean(
+    order.payments?.some((payment) => payment.status === "SUCCEEDED"),
+  );
 }

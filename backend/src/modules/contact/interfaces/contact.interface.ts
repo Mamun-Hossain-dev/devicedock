@@ -7,7 +7,7 @@ export const ContactStatus = {
 export type ContactStatus = (typeof ContactStatus)[keyof typeof ContactStatus];
 
 export interface ContactMessage {
-  id: number;
+  id: string;
   name: string;
   email: string;
   subject: string;

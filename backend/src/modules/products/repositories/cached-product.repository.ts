@@ -60,7 +60,7 @@ export class CachedProductRepository implements ProductRepository {
     return load;
   }
 
-  async findById(id: number): Promise<Product | null> {
+  async findById(id: string): Promise<Product | null> {
     const cacheKey = this.getIdCacheKey(id);
     const cachedProduct = await this.readJsonCache<Product>(cacheKey);
 
@@ -96,9 +96,9 @@ export class CachedProductRepository implements ProductRepository {
   }
 
   async adjustStock(
-    id: number,
+    id: string,
     quantity: number,
-    adjustedById: number,
+    adjustedById: string,
     reason: string,
   ) {
     const result = await this.repository.adjustStock(
@@ -127,7 +127,7 @@ export class CachedProductRepository implements ProductRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     input: UpdateProductInput,
     images: NewProductImage[] = [],
   ): Promise<Product | null> {
@@ -143,7 +143,7 @@ export class CachedProductRepository implements ProductRepository {
     return updatedProduct;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.repository.delete(id);
 
     await this.deleteCacheKey(this.getIdCacheKey(id));
@@ -151,7 +151,7 @@ export class CachedProductRepository implements ProductRepository {
   }
 
   async addImages(
-    id: number,
+    id: string,
     images: NewProductImage[],
   ): Promise<Product | null> {
     const product = await this.repository.addImages(id, images);
@@ -163,11 +163,11 @@ export class CachedProductRepository implements ProductRepository {
     return product;
   }
 
-  findImage(productId: number, imageId: number) {
+  findImage(productId: string, imageId: string) {
     return this.repository.findImage(productId, imageId);
   }
 
-  async deleteImage(productId: number, imageId: number): Promise<void> {
+  async deleteImage(productId: string, imageId: string): Promise<void> {
     await this.repository.deleteImage(productId, imageId);
     await this.deleteCacheKey(this.getIdCacheKey(productId));
     await this.invalidateCatalogLists();
@@ -195,7 +195,7 @@ export class CachedProductRepository implements ProductRepository {
     }
   }
 
-  private getIdCacheKey(id: number): string {
+  private getIdCacheKey(id: string): string {
     return `product:id:${id}`;
   }
 
